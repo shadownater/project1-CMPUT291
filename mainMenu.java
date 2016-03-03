@@ -12,10 +12,14 @@ public static void menu(){
 
   VehicleReg v = new VehicleReg();
   
+  System.out.println("-----------------------------------------------------");
   
   System.out.println("Welcome to the Auto Registration System!\n Please select an option to begin:");
 
   System.out.println("1- New Vehicle Registration\n2- Auto Transaction\n3- Driver Licence Registration\n4- Violation Record\n5- Search Engine\n6- Exit");
+
+    System.out.println("-----------------------------------------------------");
+
 
     //listen for input
     Scanner scanner = new Scanner(System.in);
@@ -27,33 +31,58 @@ public static void menu(){
       switch(number){
       case 1:
         System.out.println("Welcome to New Vehicle Registration Menu!");
-        v.tester();
-        //call function for vehicleReg here!
+        v.vehicleRegMenu();
+        
+        //returning from vehicle registration - go back to the main menu
+        System.out.println();
+        menu();
         break;
+        
       case 2:
         System.out.println("Welcome to Auto Transaction Menu!");
+
+        //returning from Auto Transaction - go back to the main menu
+        System.out.println();
+        menu();
         break;
+        
       case 3:
         System.out.println("Welcome to Driver Licence Registration Menu!");
+
+        //returning from Driver Licence Reg - go back to the main menu
+        System.out.println();
+        menu();
         break;
+        
       case 4:
         System.out.println("Welcome to Violation Record Menu!");
+
+        //returning from Violation Record Menu - go back to the main menu
+        System.out.println();
+        menu();
         break;
+        
       case 5:
         System.out.println("Welcome to the Search Engine!");
+
+        //returning from search - go back to the main menu
+        System.out.println();
+        menu();
         break;
+        
       case 6:
         System.out.println("Bye-bye!");
         System.exit(0);
         break;
+        
       default:
-        System.out.println("That is not a valid input! Try again.\n");
+        System.out.println("That is not a valid input! Try again.");
         menu(); //iffy but fix later if problems
         break;
 
       }
     }catch(NumberFormatException e){
-      System.out.println("Invalid input! Please try again.");
+      System.out.println("That is not a valid input! Try again.");
       menu(); //this is kinda weird but works for now
     }  
 
@@ -65,8 +94,8 @@ public static void menu(){
 
 public static void main(String args[]){
 
-  menu(); //fix me
-
+  menu();
+  System.out.println("Bye! :D");
   
  
 }//end of main

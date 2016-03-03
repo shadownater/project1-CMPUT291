@@ -18,13 +18,26 @@ public VehicleReg(){
 
 public void tester(){
   System.out.println("I'm a thing!");
+
 }
 
 public void vehicleRegMenu(){
   System.out.println("Would you like to register a vehicle? Y/N");
 
   Scanner scanner = new Scanner(System.in);
-  
+  String input = scanner.next();
+
+  if(input.equalsIgnoreCase("Y") || input.equalsIgnoreCase("N")){
+    switch(input.toLowerCase()){
+    case "y":
+      System.out.println("YEAH");
+      break;
+    case "n":
+      System.out.println("NOPE");
+      break;
+    }
+    
+    }
 }
   
 }
