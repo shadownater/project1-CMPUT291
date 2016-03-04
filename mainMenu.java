@@ -11,7 +11,7 @@ public static void menu(){
   //main menu for navigation
 
   VehicleReg v = new VehicleReg();
-  
+  AutoTrans transaction = new AutoTrans();
   System.out.println("-----------------------------------------------------");
   
   System.out.println("Welcome to the Auto Registration System!\n Please select an option to begin:");
@@ -40,7 +40,8 @@ public static void menu(){
         
       case 2:
         System.out.println("Welcome to Auto Transaction Menu!");
-
+        transaction.autoTransMenu();
+        
         //returning from Auto Transaction - go back to the main menu
         System.out.println();
         menu();
