@@ -13,6 +13,7 @@ import java.io.*;
 
 public class VehicleReg{
   Scanner scanner;
+  Helpers h;
 
   //data string man 
   String vehicleString, ownerString;
@@ -21,6 +22,7 @@ public class VehicleReg{
 
 public VehicleReg(){
   scanner = new Scanner(System.in);
+  h = new Helpers();
 }
 
 public void vehicleRegMenu(){
@@ -57,9 +59,18 @@ public void addVehicle(){
   System.out.print("Serial number(15): ");
   i = scanner.nextLine();
   if(i.isEmpty()) i=null;
-  if(r = checkValidity(i, 15, STRING_TYPE, false)){
+
+  try{
+    h.checkValidity(i, 15, STRING_TYPE, false);
     break;
-  }else System.out.println("Entry invalid. Please try again.");
+  }catch(CantBeNullException e){
+    System.out.println("Entry cannot be null!");
+  }catch(TooLongException e){
+    System.out.println("Entry too long!");
+  }catch(NumberFormatException e){
+    System.out.println("Entry in the wrong format!");
+  }
+    
   }
 
   vehicleString = i + " ";
@@ -68,9 +79,17 @@ public void addVehicle(){
   System.out.print("Maker(20): ");
   i = scanner.nextLine();
   if(i.isEmpty()) i=null;
-  if(r = checkValidity(i, 20, STRING_TYPE, true)){
+  try{
+    h.checkValidity(i, 20, STRING_TYPE, true);
     break;
-  }else System.out.println("Entry invalid. Please try again.");
+  }catch(CantBeNullException e){
+    System.out.println("Entry cannot be null!");
+  }catch(TooLongException e){
+    System.out.println("Entry too long!");
+  }catch(NumberFormatException e){
+    System.out.println("Entry in the wrong format!");
+  }
+
   }
 
   vehicleString += i + " ";
@@ -79,9 +98,17 @@ public void addVehicle(){
   System.out.print("Model(20): ");
   i = scanner.nextLine();
   if(i.isEmpty()) i=null;
-  if(r = checkValidity(i, 20, STRING_TYPE, true)){
+  try{
+    h.checkValidity(i, 20, STRING_TYPE, true);
     break;
-  }else System.out.println("Entry invalid. Please try again.");
+  }catch(CantBeNullException e){
+    System.out.println("Entry cannot be null!");
+  }catch(TooLongException e){
+    System.out.println("Entry too long!");
+  }catch(NumberFormatException e){
+    System.out.println("Entry in the wrong format!");
+  }
+    
   }
 
   vehicleString += i + " ";
@@ -90,9 +117,17 @@ public void addVehicle(){
   System.out.print("Year(4): ");
   i = scanner.nextLine();
   if(i.isEmpty()) i=null;
-  if(r = checkValidity(i, 4, NUM_TYPE, true)){
+  try{
+    h.checkValidity(i, 4, NUM_TYPE, true);
     break;
-  }else System.out.println("Entry invalid. Please try again.");
+  }catch(CantBeNullException e){
+    System.out.println("Entry cannot be null!");
+  }catch(TooLongException e){
+    System.out.println("Entry too long!");
+  }catch(NumberFormatException e){
+    System.out.println("Entry in the wrong format!");
+  }
+    
   }
 
   vehicleString += i + " ";
@@ -101,9 +136,17 @@ public void addVehicle(){
   System.out.print("Colour(10): ");
   i = scanner.nextLine();
   if(i.isEmpty()) i=null;
-  if(r = checkValidity(i, 10, STRING_TYPE, true)){
+  try{
+    h.checkValidity(i, 10, STRING_TYPE, true);
     break;
-  }else System.out.println("Entry invalid. Please try again.");
+  }catch(CantBeNullException e){
+    System.out.println("Entry cannot be null!");
+  }catch(TooLongException e){
+    System.out.println("Entry too long!");
+  }catch(NumberFormatException e){
+    System.out.println("Entry in the wrong format!");
+  }
+  
   }
 
   vehicleString += i+ " ";
@@ -112,9 +155,17 @@ public void addVehicle(){
   System.out.print("Type ID(38): ");
   i = scanner.nextLine();
   if(i.isEmpty()) i=null;
-  if(r = checkValidity(i, 38, NUM_TYPE, true)){
-    break;
-  }else System.out.println("Entry invalid. Please try again.");
+  try{
+  h.checkValidity(i, 38, NUM_TYPE, true);
+  break;
+  }catch(CantBeNullException e){
+    System.out.println("Entry cannot be null!");
+  }catch(TooLongException e){
+    System.out.println("Entry too long!");
+  }catch(NumberFormatException e){
+    System.out.println("Entry in the wrong format!");
+  }
+    
   }
 
   vehicleString += i + " ";
@@ -127,36 +178,6 @@ public void addVehicle(){
   public boolean checkVehicle(){
     return true;
   }
-
-  //AWAITING TA INFO ON IF I CAN HARDCODE THE LENGTHS, TYPES, NOT NULL/NULL
-//checks if the given input is the right length, type, and if it can be left null
-  public boolean checkValidity(String input, int length, String type, boolean canBeNull){
-
-    if(input == null){
-      if(!canBeNull){
-        return false;
-      }
-    }
-
-    //input is not null, yay! checking type - matches that we have a number/string?
-    if(type == NUM_TYPE){
-      try{
-        Integer.parseInt(input);
-          }catch(NumberFormatException e){
-        return false; //can i even do this? argioghoieh
-      } //number is ok, check its length
-      if(input.length() <= length){
-        return true;
-      }else return false;
-    }else{
-      if(input == null) return true;
-//it's a string type of some sort, it's ok if it has numbers mixed in
-      if(input.length() <= length){
-        return true;
-          }else return false;
-    }
-    
-  } //end of checkValidity
 
 //adds an owner to the database - called x times when a vehicle is successfully created
   public void addOwner(){
