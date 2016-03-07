@@ -14,7 +14,10 @@ import java.io.*;
 public class VehicleReg{
   Scanner scanner;
   Helpers h;
-VehicleObj vehicle;
+  VehicleObj vehicle;
+  String m_userName;
+  String m_password;
+  Statement stmt;
 
   //data string man 
   String vehicleString, ownerString;
@@ -36,7 +39,7 @@ public VehicleReg(){
 
 //displays the menu for vehicle registration
 public void vehicleRegMenu(){
-  System.out.println("Would you like to register a vehicle? Y/N");
+  System.out.println("Would you like to register a vehicle? Y/N\nOr would you like to add an owner? O");
 
   
   String input = scanner.nextLine();
@@ -70,8 +73,8 @@ public void confirmEntries(VehicleObj v){
     case "n":
       //**upload data to database here!
       
-      if(checkVehicle(v)) System.out.println("True!"); //want this to return uhh
-         else System.out.println("False!"); //if-check, then: commitVehicle();
+      if(!checkVehicle(v)) commitVehicle(v);
+         else System.out.println("Vehicle already exists in the database. Please try again."); 
       break;  
     case "q":
       break; 
@@ -229,11 +232,11 @@ public void addVehicle(){
     // get username
     System.out.print("Username: ");
     Console co = System.console();
-    String m_userName = co.readLine();
+    m_userName = co.readLine();
     
     // obtain password
     char[] passwordArray = co.readPassword("Password: ");
-    String m_password = new String(passwordArray);
+    m_password = new String(passwordArray);
 
     Connection m_con;
     String query;
@@ -256,7 +259,7 @@ public void addVehicle(){
       
       // Create a statement object.
       // Changed to reflect changes made in the result set and to make these changes permanent to the database too
-      Statement stmt = m_con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+      stmt = m_con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
       ResultSet rs = stmt.executeQuery(query);
 
       //check if returned anything or not
@@ -274,6 +277,26 @@ public void addVehicle(){
     
   }
 
+//commits the vehicle to the database
+  public void commitVehicle(VehicleObj veh){
+    System.out.println("Adding to database...");
+
+    //create SQL insert statement
+    String statement = veh.createInsertStatement();
+    System.out.println(statement);
+
+    try{
+    stmt.executeUpdate(statement);
+    System.out.println("Vehicle successfully added to the database!");
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+    
+  }
+
+
+  
 //adds an owner to the database - called x times when a vehicle is successfully created
   public void addOwner(){
   }

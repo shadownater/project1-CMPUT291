@@ -66,4 +66,18 @@ public String getSerialNo(){
     System.out.println("" + serial_no + " " + maker + " " + model +
                        " " + year + " " + colour + " " + type_id);
   }
+
+//creates the insert statement, while minding null values
+  public String createInsertStatement(){
+    String statement = "insert into vehicle values ('"+ serial_no + "'";
+    
+    statement += ", '" + maker + "'";
+    statement += ", '" + model + "'";
+    statement += ", "  + year;
+    statement += ", '"  + colour + "'";
+    statement += ", " + type_id;
+    statement += ")";
+    
+    return statement;
+  }
 }
