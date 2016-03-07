@@ -8,7 +8,7 @@ public class Helpers{
   
 
 //checks if the given input is the right length, type, and if it can be left null
-                                   public void checkValidity(String input, int length, String type, boolean canBeNull) throws CantBeNullException, TooLongException, NumberFormatException{
+public void checkValidity(String input, int length, String type, boolean canBeNull) throws CantBeNullException, TooLongException, NumberFormatException{
 
     //can the input be null
     if(input == null){
