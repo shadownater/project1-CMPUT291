@@ -1,0 +1,6 @@
+# Files to ignore in our repository #
+#####################################
+
+*.java~
+*.class
+.gitignore~

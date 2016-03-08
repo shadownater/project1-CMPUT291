@@ -41,6 +41,7 @@ public static void login(){
 }catch(SQLException ex) {
       System.err.println("SQLException: " +
                          ex.getMessage());
+    login();
     }
 
 
