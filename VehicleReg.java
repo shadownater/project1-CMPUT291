@@ -15,20 +15,13 @@ public class VehicleReg{
   Scanner scanner;
   Helpers h;
   VehicleObj vehicle;
-  String m_userName;
-  String m_password;
-  Statement stmt;
 
   //data string man 
   String vehicleString, ownerString;
   final String STRING_TYPE = "String";
   final String NUM_TYPE = "Integer";
   
-  // The URL we are connecting to
-  final String m_url = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
   
-  // The driver to use for connection
-  final String m_driverName = "oracle.jdbc.driver.OracleDriver";
                                                          
 public VehicleReg(){
   scanner = new Scanner(System.in);
@@ -229,48 +222,25 @@ public void addVehicle(){
 //false = it doesn't exist, therefore go ahead and add your vehicle!
   public boolean checkVehicle(VehicleObj vData){
 
-    // get username
-    System.out.print("Username: ");
-    Console co = System.console();
-    m_userName = co.readLine();
-    
-    // obtain password
-    char[] passwordArray = co.readPassword("Password: ");
-    m_password = new String(passwordArray);
-
-    Connection m_con;
-    String query;
     boolean duh = true;
     
     // SQL statement to execute
-    query = "select serial_no from Vehicle" +
+    String query = "select serial_no from Vehicle" +
       " where serial_no ='" + vData.getSerialNo() + "'";
     
     try{
-      Class drvClass = Class.forName(m_driverName);    
-    }catch(Exception e){
-      System.err.print("ClassNotFoundException: ");
-      System.err.println(e.getMessage());
-    }
-    
-    try{
-      // Establish a connection
-      m_con = DriverManager.getConnection(m_url, m_userName, m_password);
       
-      // Create a statement object.
-      // Changed to reflect changes made in the result set and to make these changes permanent to the database too
-      stmt = m_con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-      ResultSet rs = stmt.executeQuery(query);
+      ResultSet rs = Login.stmt.executeQuery(query);
 
       //check if returned anything or not
 
       duh = rs.next();
       System.out.println(duh);
 
-    }catch(SQLException ex) {
+       }catch(SQLException ex) {
       System.err.println("SQLException: " +
-                         ex.getMessage());
-    }
+                       ex.getMessage());
+      }
 
     if(duh)return true;
       else return false;
@@ -286,11 +256,11 @@ public void addVehicle(){
     System.out.println(statement);
 
     try{
-    stmt.executeUpdate(statement);
-    System.out.println("Vehicle successfully added to the database!");
+      Login.stmt.executeUpdate(statement);
+      System.out.println("Vehicle successfully added to the database!");
     }catch(SQLException ex) {
       System.err.println("SQLException: " +
-                         ex.getMessage());
+                        ex.getMessage());
     }
     
   }

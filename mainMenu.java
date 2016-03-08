@@ -6,6 +6,46 @@ import java.io.*;
 
 public class mainMenu{
   
+//logs in the user
+public static void login(){
+  Connection m_con;
+
+  //login part first:
+  
+  // get username
+  System.out.print("Username: ");
+  Console co = System.console();
+  Login.m_userName = co.readLine();
+  
+  // obtain password
+  char[] passwordArray = co.readPassword("Password: ");
+  Login.m_password =new String(passwordArray);
+  
+
+  try{
+    Class drvClass = Class.forName(Login.m_driverName);    
+  }catch(Exception e){
+    System.err.print("ClassNotFoundException: ");
+    System.err.println(e.getMessage());
+  }
+  
+  try{
+    // Establish a connection
+    m_con = DriverManager.getConnection(Login.m_url, Login.m_userName, Login.m_password);
+    
+    // Create a statement object.
+    // Changed to reflect changes made in the result set and to make these changes permanent to the database too
+    Login.stmt = m_con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+
+  
+}catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+
+
+}
+
 
 public static void menu(){
   //main menu for navigation
@@ -97,6 +137,7 @@ public static void menu(){
 
 public static void main(String args[]){
 
+  login();
   menu();
   System.out.println("Bye! :D");
   
