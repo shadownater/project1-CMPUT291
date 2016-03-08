@@ -43,12 +43,8 @@ public void autoTransMenu() {
 }
 
 public void addTransaction() {
-  System.out.print("You will need the id (the SIN number) of the seller and the buyer,\n" +
-                   "the vehicle serial number, and the price.\n");
-
-  // ask for all input
   // check if vehicle is in system or not
-  // if not, complete VehicleReg
+  // if not, end function, suggest go to VehicleReg
   // else, update vehicle transaction info
   // tables required: owner, auto_sale
 
@@ -64,21 +60,25 @@ public void addTransaction() {
   String new_owner;  // buyer_id
   String auto_sold;  // vehicle_id
   Integer cost;     // price
-
-  System.out.print("Vehicle Id: ");
-  auto_sold = scanner.nextLine();
-
-  System.out.print("Seller Id: ");
-  prev_owner = scanner.nextLine();
   
-  System.out.print("Buyer Id: ");
-  new_owner = scanner.nextLine();
+  System.out.println("(15 characters)              | Vehicle Id: ");
+  auto_sold = "10102020\n"; //scanner.nextLine().toLowerCase();
+  // If vehicle does not exist, do not create new one.
+  // instead instruct user to go do a vehicle registration and
+  // return later
 
-  System.out.print("Price of sale: ");
-  cost = Integer.parseInt(scanner.nextLine());
+  // If people don't exist, however, create a new person.
+  System.out.println("(15 characters)              | Seller Id: ");
+  prev_owner = "Arthur 990"; //scanner.nextLine().toLowerCase(); // no spaces
+
+  System.out.println("(15 characters)              | Buyer Id: ");
+  new_owner = "Felicia123\n"; //scanner.nextLine().toLowerCase();
+
+  System.out.println("(9 digits, 2 decimal places) | Price of sale: ");
+  cost = Integer.parseInt("80000.90");//Integer.parseInt(scanner.nextLine());
 
 
-  System.out.print("Transaction Complete\n");
+  System.out.print("\nTransaction Complete\n");
 }
 }
 
