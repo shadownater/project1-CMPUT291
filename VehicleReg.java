@@ -107,7 +107,6 @@ public void addVehicle(){
   }
   
   vehicle.setSerialNo(i);
-  //vehicleString = i + " ";
 
   while(true){
   System.out.print("Maker(20): ");
@@ -126,7 +125,6 @@ public void addVehicle(){
 
   }
   vehicle.setMaker(i);
-  //vehicleString += i + " ";
 
   while(true){
   System.out.print("Model(20): ");
@@ -145,7 +143,6 @@ public void addVehicle(){
     
   }
   vehicle.setModel(i);
-  //vehicleString += i + " ";
 
   while(true){
   System.out.print("Year(4): ");
@@ -164,8 +161,7 @@ public void addVehicle(){
     
   }
   
-  vehicle.setYear(i); //might complain here
-  //vehicleString += i + " ";
+  vehicle.setYear(i); 
 
   while(true){
   System.out.print("Colour(10): ");
@@ -185,14 +181,15 @@ public void addVehicle(){
   }
 
   vehicle.setColour(i);
-  //vehicleString += i+ " ";
-
+  boolean bah=false;
+  
   while(true){
   System.out.print("Type ID(38): ");
   i = scanner.nextLine();
   if(i.isEmpty()) i=null;
   try{
   h.checkValidity(i, 38, NUM_TYPE, true);
+  h.checkFK(i, "vehicle_type", "type_id", true, true);
   break;
   }catch(CantBeNullException e){
     System.out.println("Entry cannot be null!");
@@ -200,12 +197,24 @@ public void addVehicle(){
     System.out.println("Entry too long!");
   }catch(NumberFormatException e){
     System.out.println("Entry in the wrong format!");
-  }
-    
-  }
+  }catch(FKException e){
+    System.out.println("Entry does not exist in vehicle_type table. Add to type table? Y/N");
 
+    String response = scanner.nextLine();
+  
+  if(response.equalsIgnoreCase("Y") || response.equalsIgnoreCase("N") || response.equalsIgnoreCase("Q")){
+    switch(response.toLowerCase()){
+    case "y":
+      commitType(i);
+      bah=true;
+      break;
+    }//end of switch 
+  }//end of if statement
+  }//end of catch
+  if(bah)break;
+  }//end of while
+  
   vehicle.setType_Id(i);
-  //vehicleString += i + " ";
 
   System.out.println("Data entered: ");
   vehicle.printAll();
@@ -252,19 +261,40 @@ public void addVehicle(){
     System.out.println("Adding to database...");
 
     //create SQL insert statement
-    String statement = veh.createInsertStatement();
-    System.out.println(statement);
 
+    String statement = veh.createInsertStatement();
+    System.out.println(statement); 
+
+    
     try{
-      Login.stmt.executeUpdate(statement);
+       Login.stmt.executeUpdate(statement);
       System.out.println("Vehicle successfully added to the database!");
     }catch(SQLException ex) {
       System.err.println("SQLException: " +
                         ex.getMessage());
     }
     
+    
   }
 
+  public void commitType(String type_id){
+    System.out.println("Adding to database...");
+
+    //create SQL insert statement
+
+    String statement = "insert into vehicle_type values (" + type_id + ", NULL)"; 
+    System.out.println(statement); 
+
+    
+    try{
+       Login.stmt.executeUpdate(statement);
+      System.out.println("Type_ID successfully added to the database!");
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                        ex.getMessage());
+    }
+
+  }
 
   
 //adds an owner to the database - called x times when a vehicle is successfully created

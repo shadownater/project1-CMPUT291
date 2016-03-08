@@ -70,12 +70,23 @@ public String getSerialNo(){
 //creates the insert statement, while minding null values
   public String createInsertStatement(){
     String statement = "insert into vehicle values ('"+ serial_no + "'";
-    
-    statement += ", '" + maker + "'";
-    statement += ", '" + model + "'";
-    statement += ", "  + year;
-    statement += ", '"  + colour + "'";
-    statement += ", " + type_id;
+
+    //don't be like me and write nulls as strings :D
+    if(maker !=null)statement += ", '" + maker + "'";
+    else statement += ", NULL";
+
+    if(model !=null)statement += ", '" + model + "'";
+    else statement += ", NULL";
+
+    if(year !=null)statement += ", "  + year;
+    else statement += ", NULL";
+
+    if(colour !=null)statement += ", '"  + colour + "'";
+    else statement += ", NULL";
+
+    if(type_id !=null)statement += ", " + type_id;
+    else statement += ", NULL";
+
     statement += ")";
     
     return statement;
