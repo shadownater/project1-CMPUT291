@@ -12,6 +12,7 @@ public static void menu(){
 
   VehicleReg v = new VehicleReg();
   AutoTrans transaction = new AutoTrans();
+  SearchEngine search = new SearchEngine();
   System.out.println("-----------------------------------------------------");
   
   System.out.println("Welcome to the Auto Registration System!\n Please select an option to begin:");
@@ -65,7 +66,8 @@ public static void menu(){
         
       case 5:
         System.out.println("Welcome to the Search Engine!");
-
+        search.searchMenu();
+        
         //returning from search - go back to the main menu
         System.out.println();
         menu();
