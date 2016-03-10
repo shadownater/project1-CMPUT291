@@ -102,7 +102,7 @@ public void confirmEntries(Owner o){
     case "n":
       //**upload data to database here!
       
-      if(!checkOwner(o)){
+      if(!h.checkTwoPK("owner_id", "vehicle_id", o.getOwnerId(), o.getVehicleId(), "owner", true)){
         commitOwner(o);
         vehicleRegMenu();
       }
@@ -133,6 +133,7 @@ public void addVehicle(){
 
   try{
     h.checkValidity(i, 15, STRING_TYPE, false);
+    //check if that primary key is available or not
     break;
   }catch(CantBeNullException e){
     System.out.println("Entry cannot be null!");
@@ -273,7 +274,7 @@ public void addVehicle(){
     
     // SQL statement to execute
     String query = "select serial_no from Vehicle" +
-      " where serial_no ='" + vData.getSerialNo() + "'";
+      " where UPPER(serial_no) ='" + vData.getSerialNo().toUpperCase() + "'";
     
     try{
       
@@ -282,7 +283,7 @@ public void addVehicle(){
       //check if returned anything or not
 
       duh = rs.next();
-      System.out.println(duh);
+
 
        }catch(SQLException ex) {
       System.err.println("SQLException: " +
@@ -301,7 +302,6 @@ public void addVehicle(){
     //create SQL insert statement
 
     String statement = veh.createInsertStatement();
-    System.out.println(statement); 
 
     
     try{
@@ -321,7 +321,6 @@ public void addVehicle(){
     //create SQL insert statement
 
     String statement = "insert into vehicle_type values (" + type_id + ", NULL)"; 
-    System.out.println(statement); 
 
     
     try{
@@ -385,9 +384,11 @@ public void addOwner(){
   if(response.equalsIgnoreCase("Y") || response.equalsIgnoreCase("N")){
     switch(response.toLowerCase()){
     case "y":
-      commitPeople(i);
+    boolean result=false;
+    result = commitPeople(i);
       c1=true;
-      break;
+      if(c1 && result)
+        break;
     }//end of switch 
   }//end of if statement
   }//end of catch
@@ -455,17 +456,44 @@ public void addOwner(){
   confirmEntries(owner);
 }//end of addOwner
 
-//will check to see if the owner already exists
-public boolean checkOwner(Owner owner){
-  return false;
-}
-
 //adds the owner to the database
 public void commitOwner(Owner own){
+
+  String query = own.createInsertStatement();
+
+  try{
+    Login.stmt.executeUpdate(query);
+    System.out.println("Owner successfully added to the database!");
+  }catch(SQLException ex) {
+    System.err.println("SQLException: " +
+                       ex.getMessage());
+  }
+  
 }
 
 //adds a person to the database (already know they're not in it)
-public void commitPeople(String sin){
+public boolean commitPeople(String sin){
+  //make sure the sin is valid before going ahead
+  try{
+  h.checkValidity(sin, 15, STRING_TYPE, false);
+  }catch(CantBeNullException e){return false;
+  }catch(TooLongException e){return false;
+  }catch(NumberFormatException e){return false;
+  }
+
+  //get here if it's ok!
+  
+  String query = "insert into people values ('" + sin + "', null, null, null, null, null, null, null, null)";
+
+  try{
+    Login.stmt.executeUpdate(query);
+    System.out.println("Person successfully added to the database!");
+  }catch(SQLException ex) {
+    System.err.println("SQLException: " +
+                       ex.getMessage());
+  }
+  
+  return true;
 }
   
 }

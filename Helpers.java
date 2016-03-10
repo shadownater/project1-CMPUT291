@@ -42,11 +42,11 @@ public void checkValidity(String input, int length, String type, boolean canBeNu
       return;
     
     //performs a small query to check if the foreign key is in the other table
-    String query = "select " + col + " from " + fTable + " where " + col + "=";
+    String query = "select " + col + " from " + fTable + " where UPPER(" + col + ")=";
     boolean anything=true;
     
     if(isNum) query += enteredValue;
-    else query += "'" + enteredValue + "'";
+    else query += "'" + enteredValue.toUpperCase() + "'"; 
     
     try{
       ResultSet rs = Login.stmt.executeQuery(query);
@@ -64,4 +64,49 @@ public void checkValidity(String input, int length, String type, boolean canBeNu
 
     
   }
+
+//checks the primary key for two attributes that are primary keys if they are already a combination
+//within the table. Needed for only Owner and Restriction as far as I can tell?
+//assumes that you would not send it a null (since they're PKs)
+//**isSame: this will be set true for owner but false for restriction because restriction's PKs
+  //are not the same type! Not worrying about the other combos of quotation marks bc we don't ever have them
+  public boolean checkTwoPK(String col1, String col2, String entry1, String entry2, String table, boolean isSame){
+
+    boolean check=true;
+    String query;
+
+    if(isSame){
+    query = "select " + col1 + ", " + col2  + " from " + table +
+      " where UPPER(" + col1 + ")= '" + entry1.toUpperCase() + "' and UPPER(" + col2 + ")= '" + entry2.toUpperCase() + "'";  
+
+      }else{
+      //for restriction
+      query = "select " + col1 + ", " + col2  + " from " + table +
+        " where UPPER(" + col1 + ")= '" + entry1.toUpperCase() + "' and UPPER(" + col2 + ")=  " + entry2.toUpperCase();
+      
+    }
+
+    try{
+
+      ResultSet rs = Login.stmt.executeQuery(query);
+
+      //check if returned anything or not
+
+      check = rs.next();
+
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+
+    if(check)return true;
+    else return false;
+    
+    
+
+
+      
+  }
 }
+
+  
