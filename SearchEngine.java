@@ -142,9 +142,10 @@ public class SearchEngine{
         }
         // Have to decide how to handle multivalue (ie restrictions)
         //  two queries? **-KG
+        // Note: query tested and functional M9-KG
         query =
-            "SELECT name, licence_no, addr, birthday, class, description,expiring_date\n" +
-            "FROM people p, drive_livenve dl, driving_condition dc, restriction r\n" +
+            "SELECT name, dl.licence_no, addr, birthday, class, description,expiring_date\n" +
+            "FROM people p, drive_licence dl, driving_condition dc, restriction r\n" +
             "WHERE p.sin = dl.sin AND dl.licence_no = r.licence_no AND\n" +
             "r.r_id = dc.c_id AND";
         
@@ -153,14 +154,17 @@ public class SearchEngine{
         }else if(searchBy == 2) {
             query += " LOWER(p.name) = ";
         }
-        query += "\"" + i.toLowerCase() + "\"";
+        query += "\'" + i.toLowerCase() + "\';";
 
-        System.out.println("\nWas there a mistake? Y/N or Q to quit (will not upload to database.)");        
-
+        System.out.println("\nWas there a mistake? Y/N or Q to quit (will not upload to database.)");
+        
         String isOk = scanner.nextLine();
         while(!isOk.equalsIgnoreCase("Q")){
             if(isOk.equalsIgnoreCase("Y")) driverSearch(searchBy);
-            else if(isOk.equalsIgnoreCase("N")) break; // query here
+            else if(isOk.equalsIgnoreCase("N")) {
+                System.out.println(query);
+                break; // query here
+            }
             scanner.nextLine();
         }
 
