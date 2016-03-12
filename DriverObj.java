@@ -32,7 +32,7 @@ public class DriverObj{
         drivingClass = input;
     }
 
-    public void addDrivingConditions(String input){
+    public void addDrivingCondition(String input){
         // Note: multivalue attribute
         drivingConditions.add(input);
     }

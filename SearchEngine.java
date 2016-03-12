@@ -177,8 +177,9 @@ public class SearchEngine{
             rs = Login.stmt.executeQuery(query);
             // Check if any results
             if (rs.isBeforeFirst()) {
-                
-                parseDriverSearch(rs);
+                Map<String,DriverObj> m = new HashMap<>();                
+                m = parseDriverSearch(rs);
+                printDriverResults(m);
             }else{
                 System.out.println("Sorry, no matches found.");
             }
@@ -189,18 +190,19 @@ public class SearchEngine{
 
     }
 
-    public void parseDriverSearch(ResultSet rs){
+    public Map<String,DriverObj> parseDriverSearch(ResultSet rs){
         // Use a map to hold drivers, keys are licence_no
 
         Map<String,DriverObj> m = new HashMap<>();
         String s = new String();
+        
         try{
             // While records to process
             while(rs.next()){
                 // Check if we've made this driverObj yet
-                s = rs.getString("licence_no");            
+                s = rs.getString("licence_no");
+                DriverObj d = new DriverObj();                
                 if (!m.containsKey(s)){
-                    DriverObj d = new DriverObj();                
                     d.setLicenceNo(s);
                     m.put(s,d);
                     
@@ -219,16 +221,31 @@ public class SearchEngine{
                     s = rs.getString("expiring_date");
                     d.setExpiryDate(s);
 
-                    //d.printAll();
+                }
+                // Add driving condition descriptions
+                s = rs.getString("description");
+                if(s != null){
+                    s = rs.getString("licence_no");
+                    d = m.get(s);
+                    s = rs.getString("description");
+                    d.addDrivingCondition(s);
                 }
             }
         }catch(SQLException e){
             System.err.println("SQLException: " +
                                e.getMessage());                
-        }
-   
+        }        
+
+        return m;
     }
 
+    public void printDriverResults(Map<String,DriverObj> m){
+        DriverObj d;
+        for(String k: m.keySet()){
+            d = m.get(k);
+            d.printAll();            
+        }
+    }
 }
 
                            
