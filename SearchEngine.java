@@ -12,7 +12,7 @@ import java.io.*;
 /*
    Specification:
     1) Driver Search:
-         -Lists: name, licence_no, address, birthday, 
+         -Lists: name, licence_no, addr, birthday, 
                  driving class, driving_condition, expiry_date
          -Query by: licence_no or name
     2) Violation Search:
@@ -38,12 +38,6 @@ public class SearchEngine{
 
     // 
     final String STRING_TYPE = "String";
-
-    // The URL we are connecting to
-    final String m_url = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
-  
-    // The driver to use for connection
-    final String m_driverName = "oracle.jdbc.driver.OracleDriver";
 
     public SearchEngine(){
         scanner = new Scanner(System.in);
@@ -79,7 +73,9 @@ public class SearchEngine{
     }
 
     public void driverSearchMenu(){
-        // A menu to select search option
+        /**
+           Idea: user picks criteria, enters search term, calls driverSearch
+         **/
         System.out.println("Driver Search:\n" +
                            "Select an option:\n" +
                            "1- Search by licence number\n" +
@@ -89,13 +85,60 @@ public class SearchEngine{
         String input = scanner.nextLine();
         while(!input.equals("3")){
             if(input.equals("1")){
-                driverSearch(Integer.parseInt(input));
+                String name = ""; 
+                String i = "";
+                
+                // Check validity of user search criteria, l is valid length
+                int l=15;
+                String prompt = "Licence(15): ";
+                while(true){
+                    System.out.print(prompt);
+                    i = scanner.nextLine();
+                    if(i.isEmpty()) i=null;
+
+                    try{
+                        h.checkValidity(i, l, STRING_TYPE, false);
+                        break;
+                    }catch(CantBeNullException e){
+                        System.out.println("Entry cannot be null!");
+                    }catch(TooLongException e){
+                        System.out.println("Entry too long!");
+                    }catch(NumberFormatException e){
+                        System.out.println("Entry in the wrong format!");
+                    }
+                }                    
+
+                // Do the search
+                driverSearch(name, i);
                 break;
             }else if(input.equals("2")){
-                driverSearch(Integer.parseInt(input));
+                String licence_no = ""; 
+                String i = "";
+                
+                // Check validity of user search criteria, l is valid length
+                int l=40;
+                String prompt = "Name(40): ";        
+                while(true){
+                    System.out.print(prompt);
+                    i = scanner.nextLine();
+                    if(i.isEmpty()) i=null;
+
+                    try{
+                        h.checkValidity(i, l, STRING_TYPE, false);
+                        break;
+                    }catch(CantBeNullException e){
+                        System.out.println("Entry cannot be null!");
+                    }catch(TooLongException e){
+                        System.out.println("Entry too long!");
+                    }catch(NumberFormatException e){
+                        System.out.println("Entry in the wrong format!");
+                    }
+                }
+                // Do the search
+                driverSearch(i, licence_no);
                 break;
             }else if(input.equals("3")){
-                System.out.println("That is 3");
+                searchMenu();
                 break;
             }else{
                 System.out.println("That is not a valid input! Try again.");
@@ -104,71 +147,88 @@ public class SearchEngine{
         }        
     }
 
-    public void driverSearch(int searchBy){
-        // Valid inputs: 1 (search by licence), 2 (search by name)
-        String i;
+    public void driverSearch(String name, String licenceNo){
+        /**
+             Idea: This is the main driver search, and searches by licence or name.
+                   Calls parseDriverSearch.
+             
+         **/
+        
         String query;
-
-        // Set searchBy variables
-        // l for valid length
-        int l=0;
-        String prompt = "";
-        // Valid length determined by searchBy
-        if(searchBy == 1) {
-            l = 15;
-            prompt = "Licence(15): ";
-        }else if(searchBy == 2) {
-            l = 40;
-            prompt = "Name(40): ";
-        }
+        ResultSet rs;
         
-
-        // Sync this with ie. vehiclereg.java **-KG
-        while(true){
-            System.out.print(prompt);
-            i = scanner.nextLine();
-            if(i.isEmpty()) i=null;
-
-            try{
-                h.checkValidity(i, l, STRING_TYPE, false);
-                break;
-            }catch(CantBeNullException e){
-                System.out.println("Entry cannot be null!");
-            }catch(TooLongException e){
-                System.out.println("Entry too long!");
-            }catch(NumberFormatException e){
-                System.out.println("Entry in the wrong format!");
-            }
-        }
-        // Have to decide how to handle multivalue (ie restrictions)
-        //  two queries? **-KG
-        // Note: query tested and functional M9-KG
+        // Create SQL query statement
         query =
-            "SELECT name, dl.licence_no, addr, birthday, class, description,expiring_date\n" +
-            "FROM people p, drive_licence dl, driving_condition dc, restriction r\n" +
-            "WHERE p.sin = dl.sin AND dl.licence_no = r.licence_no AND\n" +
-            "r.r_id = dc.c_id AND";
+            "SELECT name, dl.licence_no, addr, birthday, class, description, expiring_date\n"+
+            "FROM people p, drive_licence dl\n" +
+            "LEFT JOIN restriction r ON r.licence_no = dl.licence_no\n" +
+            "LEFT JOIN driving_condition dc ON dc.c_id = r.r_id\n" +
+            "WHERE p.sin = dl.sin AND dl.class <> 'nondriving' AND\n" +
+            "(LOWER(dl.licence_no) = ";
         
-        if(searchBy == 1) {
-            query += " LOWER(dl.licence_no) = ";
-        }else if(searchBy == 2) {
-            query += " LOWER(p.name) = ";
-        }
-        query += "\'" + i.toLowerCase() + "\';";
+        query += "\'" + licenceNo.toLowerCase() + "\'" + " OR LOWER(name) = ";
+        query += "\'" + name.toLowerCase() + "\')";
 
-        System.out.println("\nWas there a mistake? Y/N or Q to quit (will not upload to database.)");
-        
-        String isOk = scanner.nextLine();
-        while(!isOk.equalsIgnoreCase("Q")){
-            if(isOk.equalsIgnoreCase("Y")) driverSearch(searchBy);
-            else if(isOk.equalsIgnoreCase("N")) {
-                System.out.println(query);
-                break; // query here
+        // Debug statement print out **-KG
+        // System.out.println(query);
+
+        // try to find the licence
+        try{
+            rs = Login.stmt.executeQuery(query);
+            // Check if any results
+            if (rs.isBeforeFirst()) {
+                
+                parseDriverSearch(rs);
+            }else{
+                System.out.println("Sorry, no matches found.");
             }
-            scanner.nextLine();
+        }catch(SQLException ex){
+            System.err.println("SQLException: " +
+                               ex.getMessage());
         }
 
     }
+
+    public void parseDriverSearch(ResultSet rs){
+        // Use a map to hold drivers, keys are licence_no
+
+        Map<String,DriverObj> m = new HashMap<>();
+        String s = new String();
+        try{
+            // While records to process
+            while(rs.next()){
+                // Check if we've made this driverObj yet
+                s = rs.getString("licence_no");            
+                if (!m.containsKey(s)){
+                    DriverObj d = new DriverObj();                
+                    d.setLicenceNo(s);
+                    m.put(s,d);
+                    
+                    s = rs.getString("name");
+                    d.setName(s);
+
+                    s = rs.getString("addr");
+                    d.setAddr(s);
+
+                    s = rs.getString("birthday");
+                    d.setBirthday(s);
+
+                    s = rs.getString("class");
+                    d.setDrivingClass(s);
+
+                    s = rs.getString("expiring_date");
+                    d.setExpiryDate(s);
+
+                    //d.printAll();
+                }
+            }
+        }catch(SQLException e){
+            System.err.println("SQLException: " +
+                               e.getMessage());                
+        }
+   
+    }
+
 }
 
                            
