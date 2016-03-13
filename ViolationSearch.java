@@ -3,7 +3,7 @@ import java.sql.*;
 import java.io.*;
 
 public class ViolationSearch{
-    Scanner scanner = new Scanner(System.in);
+    Scanner scanner = IO.getScanner();
     Helpers h = new Helpers();
     Statement s;
     final String STRING_TYPE = "String";

@@ -30,8 +30,8 @@ import java.io.*;
 
 public class SearchEngine{
     
-    Scanner scanner;
-    Helpers h;
+    Scanner scanner = IO.getScanner();
+    Helpers h = new Helpers();;
     Statement stmt;
 
     DriverSearch d;
@@ -40,10 +40,10 @@ public class SearchEngine{
     
     final String STRING_TYPE = "String";
 
-    public SearchEngine(){
-        scanner = new Scanner(System.in);
-        h = new Helpers();
-    }
+    //public SearchEngine(){
+    //    scanner = new Scanner(System.in);
+    //    h = new Helpers();
+    //}
     
     public void searchMenu(){
         boolean searching = true;
