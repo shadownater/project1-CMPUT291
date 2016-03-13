@@ -8,86 +8,108 @@ public class ViolationSearch{
     Statement s;
     final String STRING_TYPE = "String";
 
-    public void violationSearchMenu(){
+    public boolean violationSearchMenu(){
         /**
            Idea: user picks criteria, enters search term, calls violationSearch
          **/
-        System.out.println("Violation Search:\n" +
-                           "Select an option:\n" +
-                           "1- Search by licence number\n" +
-                           "2- Search by sin\n" +
-                           "3- Return to search engine menu");
         
-        String input = scanner.nextLine();
-        while(!input.equals("3")){
-            if(input.equals("1")){
-                String sin = ""; 
-                String i = "";
+        while(true){
+            System.out.println("Violation Search:\n" +
+                               "Select an option:\n" +
+                               "1- Search by licence number\n" +
+                               "2- Search by sin\n" +
+                               "3- Return to search engine menu\n" +
+                               "4- Return to main menu");
+
+            String input = scanner.nextLine();
+            boolean succ = false;        
+            
+            while(true){
+                if(input.equals("1")){
+                    String sin = ""; 
+                    String i = "";
                 
-                // Check validity of user search criteria, l is valid length
-                int l=15;
-                String prompt = "Licence(15): ";
-                while(true){
-                    System.out.print(prompt);
-                    i = scanner.nextLine();
-                    if(i.isEmpty()) i=null;
+                    // Check validity of user search criteria, l is valid length
+                    int l=15;
+                    String prompt = "Licence(15): ";
+                    while(true){
+                        System.out.print(prompt);
+                        i = scanner.nextLine();
+                        if(i.isEmpty()) i=null;
 
-                    try{
-                        h.checkValidity(i, l, STRING_TYPE, false);
-                        break;
-                    }catch(CantBeNullException e){
-                        System.out.println("Entry cannot be null!");
-                    }catch(TooLongException e){
-                        System.out.println("Entry too long!");
-                    }catch(NumberFormatException e){
-                        System.out.println("Entry in the wrong format!");
-                    }
-                }                    
-
-                // Do the search
-                violationSearch(sin, i);
-                break;
-            }else if(input.equals("2")){
-                String licence_no = ""; 
-                String i = "";
+                        try{
+                            h.checkValidity(i, l, STRING_TYPE, false);
+                            break;
+                        }catch(CantBeNullException e){
+                            System.out.println("Entry cannot be null!");
+                        }catch(TooLongException e){
+                            System.out.println("Entry too long!");
+                        }catch(NumberFormatException e){
+                            System.out.println("Entry in the wrong format!");
+                        }
+                    }                    
+                    // Do the search
+                    succ = violationSearch(sin, i);
+                    // if success, return to searchEngineMenu
+                    if (succ) return true;
+                    // if !success, return to violationSearchMenu
+                    break;
+                    
+                }else if(input.equals("2")){
+                    String licence_no = ""; 
+                    String i = "";
                 
-                // Check validity of user search criteria, l is valid length
-                int l=15;
-                String prompt = "Sin(15): ";        
-                while(true){
-                    System.out.print(prompt);
-                    i = scanner.nextLine();
-                    if(i.isEmpty()) i=null;
+                    // Check validity of user search criteria, l is valid length
+                    int l=15;
+                    String prompt = "Sin(15): ";        
+                    while(true){
+                        System.out.print(prompt);
+                        i = scanner.nextLine();
+                        if(i.isEmpty()) i=null;
 
-                    try{
-                        h.checkValidity(i, l, STRING_TYPE, false);
-                        break;
-                    }catch(CantBeNullException e){
-                        System.out.println("Entry cannot be null!");
-                    }catch(TooLongException e){
-                        System.out.println("Entry too long!");
-                    }catch(NumberFormatException e){
-                        System.out.println("Entry in the wrong format!");
+                        try{
+                            h.checkValidity(i, l, STRING_TYPE, false);
+                            break;
+                        }catch(CantBeNullException e){
+                            System.out.println("Entry cannot be null!");
+                        }catch(TooLongException e){
+                            System.out.println("Entry too long!");
+                        }catch(NumberFormatException e){
+                            System.out.println("Entry in the wrong format!");
+                        }
                     }
+                    // Do the search
+                    succ = violationSearch(i, licence_no);
+                    // if success, return to searchEngineMenu
+                    if(succ) return true;
+                    // if !success, return to violationSearchMenu
+                    break;
+                    
+                }else if(input.equals("3")){
+                    // still using search, so searching = true
+                    return true;
+                    
+                }else if(input.equals("4")){
+                    // finished with search, so searching = false
+                    return false;                    
+
+                }else{
+                    System.out.println("That is not a valid input! Try again.");
                 }
-                // Do the search
-                violationSearch(i, licence_no);
-                break;
-            }else if(input.equals("3")){
-                //searchMenu();
-                break;
-            }else{
-                System.out.println("That is not a valid input! Try again.");
-            }
-            input = scanner.nextLine();
-        } 
+                input = scanner.nextLine();
+            } 
+        }
     }
 
-    public void violationSearch(String sin, String licenceNo){
+    public boolean violationSearch(String sin, String licenceNo){
         /**
              Idea: This is the main violation search, and searches by licence or name.
-                   Calls parseViolationSearch.
-             
+                   Calls parseViolationSearch, then printViolationSearch
+                   
+             Input: sin or licenceNo (both case insensitive), 
+                    pass "" for unknown value
+
+             Returns: true if successful, false if no matches found
          **/
         
         String query;
@@ -104,7 +126,7 @@ public class ViolationSearch{
         query += "\'" + sin.toLowerCase() + "\')";            
 
         // Debug statement print out **-KG
-        System.out.println(query);
+        // System.out.println(query);
 
         // try to find the licence
         try{
@@ -114,12 +136,16 @@ public class ViolationSearch{
                 Map<String,ViolationObj> m = new HashMap<>();                
                 m = parseViolationSearch(rs);
                 printViolationResults(m);
+                return true;
             }else{
                 System.out.println("Sorry, no matches found.");
+                System.out.println();
+                return false;
             }
         }catch(SQLException ex){
             System.err.println("SQLException: " +
                                ex.getMessage());
+            return false;
         }
 
     }
@@ -162,11 +188,8 @@ public class ViolationSearch{
 
                 s = rs.getString("descriptions");
                 d.setDescriptions(s);
-
-                
-                
-                // Add driving condition descriptions
             }
+
         }catch(SQLException e){
             System.err.println("SQLException: " +
                                e.getMessage());                
@@ -181,5 +204,6 @@ public class ViolationSearch{
             d = m.get(k);
             d.printAll();            
         }
+        System.out.println();
     }
 }

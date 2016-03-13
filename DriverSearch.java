@@ -8,86 +8,112 @@ public class DriverSearch{
     Statement s;
     final String STRING_TYPE = "String";
     
-    public void driverSearchMenu(){
+    public boolean driverSearchMenu(){
         /**
            Idea: user picks criteria, enters search term, calls driverSearch
-         **/
-        System.out.println("Driver Search:\n" +
-                           "Select an option:\n" +
-                           "1- Search by licence number\n" +
-                           "2- Search by name\n" +
-                           "3- Return to search engine menu");
-        
-        String input = scanner.nextLine();
-        while(!input.equals("3")){
-            if(input.equals("1")){
-                String name = ""; 
-                String i = "";
+
+           Returns: true if still search
+        **/
+
+        while(true){
+            System.out.println("Driver Search:\n" +
+                               "Select an option:\n" +
+                               "1- Search by licence number\n" +
+                               "2- Search by name\n" +
+                               "3- Return to search engine menu\n" +
+                               "4- Return to main menu");       
+
+            String input = scanner.nextLine();
+            boolean succ = false;
+            
+            while(true){
+                if(input.equals("1")){
+                    String name = ""; 
+                    String i = "";
                 
-                // Check validity of user search criteria, l is valid length
-                int l=15;
-                String prompt = "Licence(15): ";
-                while(true){
-                    System.out.print(prompt);
-                    i = scanner.nextLine();
-                    if(i.isEmpty()) i=null;
+                    // Check validity of user search criteria, l is valid length
+                    int l=15;
+                    String prompt = "Licence(15): ";
+                    while(true){
+                        System.out.print(prompt);
+                        i = scanner.nextLine();
+                        if(i.isEmpty()) i=null;
 
-                    try{
-                        h.checkValidity(i, l, STRING_TYPE, false);
-                        break;
-                    }catch(CantBeNullException e){
-                        System.out.println("Entry cannot be null!");
-                    }catch(TooLongException e){
-                        System.out.println("Entry too long!");
-                    }catch(NumberFormatException e){
-                        System.out.println("Entry in the wrong format!");
-                    }
-                }                    
+                        try{
+                            h.checkValidity(i, l, STRING_TYPE, false);
+                            break;
+                        }catch(CantBeNullException e){
+                            System.out.println("Entry cannot be null!");
+                        }catch(TooLongException e){
+                            System.out.println("Entry too long!");
+                        }catch(NumberFormatException e){
+                            System.out.println("Entry in the wrong format!");
+                        }
+                    }                    
 
-                // Do the search
-                driverSearch(name, i);
-                break;
-            }else if(input.equals("2")){
-                String licence_no = ""; 
-                String i = "";
+                    // Do the search
+                    succ = driverSearch(name, i);
+                    // if success, return to SearchEngineMenu
+                    if (succ) return true;
+                    // if !success, return to DriverSearchMenu
+                    break;
                 
-                // Check validity of user search criteria, l is valid length
-                int l=40;
-                String prompt = "Name(40): ";        
-                while(true){
-                    System.out.print(prompt);
-                    i = scanner.nextLine();
-                    if(i.isEmpty()) i=null;
+                }else if(input.equals("2")){
+                    String licence_no = ""; 
+                    String i = "";
+                
+                    // Check validity of user search criteria, l is valid length
+                    int l=40;
+                    String prompt = "Name(40): ";        
+                    while(true){
+                        System.out.print(prompt);
+                        i = scanner.nextLine();
+                        if(i.isEmpty()) i=null;
 
-                    try{
-                        h.checkValidity(i, l, STRING_TYPE, false);
-                        break;
-                    }catch(CantBeNullException e){
-                        System.out.println("Entry cannot be null!");
-                    }catch(TooLongException e){
-                        System.out.println("Entry too long!");
-                    }catch(NumberFormatException e){
-                        System.out.println("Entry in the wrong format!");
+                        try{
+                            h.checkValidity(i, l, STRING_TYPE, false);
+                            break;
+                        }catch(CantBeNullException e){
+                            System.out.println("Entry cannot be null!");
+                        }catch(TooLongException e){
+                            System.out.println("Entry too long!");
+                        }catch(NumberFormatException e){
+                            System.out.println("Entry in the wrong format!");
+                        }
                     }
+                
+                    // Do the search
+                    succ = driverSearch(i, licence_no);
+                    // if success, return to SearchEngineMenu
+                    if (succ) return true;
+                    // if !success, return to DriverSearchMenu                    
+                    break;
+                
+                }else if(input.equals("3")){
+                    // still using search, so searching = true
+                    return true;
+                }else if(input.equals("4")){
+                    // finished with search, so searching = false
+                    return false;
+                }else{
+                    System.out.println("That is not a valid input! Try again.");
                 }
-                // Do the search
-                driverSearch(i, licence_no);
-                break;
-            }else if(input.equals("3")){
-                //searchMenu();
-                break;
-            }else{
-                System.out.println("That is not a valid input! Try again.");
-            }
-            input = scanner.nextLine();
-        }        
+                input = scanner.nextLine();
+            }        
+        }
     }
 
-    public void driverSearch(String name, String licenceNo){
+    public boolean driverSearch(String name, String licenceNo){
         /**
-             Idea: This is the main driver search, and searches by licence or name.
-                   Calls parseDriverSearch.
+             Idea: This is the main driver search, 
+             searches by licenceNo or name.
+                   Calls parseDriverSearch, then printDriverSearch
              
+             Input: name or licenceNo (both case insensitive)
+                    use "" as unkown value
+
+             Returns: true if successful, false if no matches found
+
          **/
         
         String query;
@@ -116,14 +142,18 @@ public class DriverSearch{
                 Map<String,DriverObj> m = new HashMap<>();                
                 m = parseDriverSearch(rs);
                 printDriverResults(m);
+                return true;
             }else{
-                System.out.println("Sorry, no matches found.");
+                System.out.println("Sorry, no matches found. Try again.");
+                System.out.println();
+                return false;
             }
+            
         }catch(SQLException ex){
             System.err.println("SQLException: " +
                                ex.getMessage());
+            return false;
         }
-
     }
 
     public Map<String,DriverObj> parseDriverSearch(ResultSet rs){
@@ -156,8 +186,8 @@ public class DriverSearch{
 
                     s = rs.getString("expiring_date");
                     d.setExpiryDate(s);
-
                 }
+                
                 // Add driving condition descriptions
                 s = rs.getString("description");
                 if(s != null){
@@ -165,13 +195,13 @@ public class DriverSearch{
                     d = m.get(s);
                     s = rs.getString("description");
                     d.addDrivingCondition(s);
-                }
+                }                
             }
+            
         }catch(SQLException e){
             System.err.println("SQLException: " +
                                e.getMessage());                
         }        
-
         return m;
     }
 
@@ -181,5 +211,6 @@ public class DriverSearch{
             d = m.get(k);
             d.printAll();            
         }
+        System.out.println();
     }
 }
