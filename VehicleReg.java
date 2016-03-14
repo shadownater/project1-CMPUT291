@@ -435,8 +435,11 @@ public void addOwner(){
   if(i.isEmpty()) i=null;
   try{
     h.checkValidity(i, 1, STRING_TYPE, false);
-    if(i.equalsIgnoreCase("Y") || i.equalsIgnoreCase("N"))
+    if(i.equalsIgnoreCase("Y") || i.equalsIgnoreCase("N")){
+      if(i.equalsIgnoreCase("Y")) checkPrimaryOwner(owner.getVehicleId());
+      if(i.equalsIgnoreCase("N")) checkAnyPrimary(owner.getVehicleId());
       break;
+    }
     else System.out.println("Entry must be 'y' or 'n'");
   }catch(CantBeNullException e){
     System.out.println("Entry cannot be null!");
@@ -444,6 +447,10 @@ public void addOwner(){
     System.out.println("Entry too long!");
   }catch(NumberFormatException e){
     System.out.println("Entry in the wrong format!");
+  }catch(AlreadyPrimaryException e){
+    System.out.println("There's already a primary owner for this vehicle. Please try again.");
+  }catch(NoPrimaryException e){
+    System.out.println("No primary owner for this vehicle. Owner must be primary owner.");
   }
   }//end of while
   
@@ -460,7 +467,8 @@ public void addOwner(){
 public void commitOwner(Owner own){
 
   String query = own.createInsertStatement();
-
+  System.out.println(query);
+  
   try{
     Login.stmt.executeUpdate(query);
     System.out.println("Owner successfully added to the database!");
@@ -495,5 +503,55 @@ public boolean commitPeople(String sin){
   
   return true;
 }
-  
+
+//Checks if the vehicle already has a primary owner - throws an exception if it does
+  public void checkPrimaryOwner(String vehicleId) throws AlreadyPrimaryException{
+    
+    String query = "Select is_primary_owner from owner where UPPER(vehicle_id)= '" + vehicleId.toUpperCase() + "'";
+
+    try{
+
+      ResultSet rs = Login.stmt.executeQuery(query);
+
+      //check if returned any with 'y' in it
+
+      boolean foundY=false;
+      
+      while(rs.next()){
+        if(rs.getString("is_primary_owner").equalsIgnoreCase("y")) foundY=true;
+      }
+      
+      if(foundY) throw new AlreadyPrimaryException();
+
+
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+  }
+
+  public void checkAnyPrimary(String vehicleId) throws NoPrimaryException{
+    String query = "Select is_primary_owner from owner where UPPER(vehicle_id)= '" + vehicleId.toUpperCase() + "'";
+
+    try{
+
+      ResultSet rs = Login.stmt.executeQuery(query);
+
+      //check if returned any with 'y' in it
+
+      boolean foundY=false;
+
+      while(rs.next()){
+        if(rs.getString("is_primary_owner").equalsIgnoreCase("y")) foundY=true;
+      }
+
+      if(!foundY) throw new NoPrimaryException();
+
+
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+    
+  }
 }
