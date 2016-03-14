@@ -6,10 +6,10 @@ public class DriverObj{
     String name;
     String licenceNo;
     String addr;
-    String birthday;
+    java.sql.Date birthday;
     String drivingClass;
     List<String> drivingConditions = new ArrayList<String>();
-    String expiryDate;
+    java.sql.Date expiryDate;
 
     // Setters
     public void setName(String input){
@@ -24,7 +24,7 @@ public class DriverObj{
         addr = input;
     }
 
-    public void setBirthday(String input){
+    public void setBirthday(java.sql.Date input){
         birthday = input;
     }
 
@@ -37,7 +37,7 @@ public class DriverObj{
         drivingConditions.add(input);
     }
 
-    public void setExpiryDate(String input){
+    public void setExpiryDate(java.sql.Date input){
         expiryDate = input;
     }
 
@@ -54,7 +54,7 @@ public class DriverObj{
         return addr;
     }
 
-    public String getBirthday(){
+    public java.sql.Date getBirthday(){
         return birthday;
     }
 
@@ -67,11 +67,11 @@ public class DriverObj{
         String s = new String();
         for(String cond: drivingConditions){
             s = s + cond + ", ";
-        }
+        }        
         return s;
     }
 
-    public String getExpiryDate(){
+    public java.sql.Date getExpiryDate(){
         return expiryDate;
     }
 
@@ -80,5 +80,18 @@ public class DriverObj{
         System.out.println("" + name + " " + licenceNo + " " + addr +
                            " " + birthday + " " + drivingClass + " " +
                            getDrivingConditions() + " " + expiryDate);
+    }
+    // Print fancier: try to emulate a real licence to a degree
+    public void printRecord(){
+        System.out.println("+-----------------------------------------------------+\n" +
+                           "|  No: " + licenceNo + "\n" +
+                           "|  Class: " + drivingClass + "\n" +
+                           "|  Cond: " + getDrivingConditions() + "\n" +
+                           "|  Expires: " + expiryDate + "\n" +
+                           "|\n" +
+                           "|  " + name + "\n" +
+                           "|  " + addr + "\n" +
+                           "|  DOB: " + birthday + "\n" +
+                           "+-----------------------------------------------------+");                           
     }
 }

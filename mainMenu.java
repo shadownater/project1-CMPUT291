@@ -64,8 +64,8 @@ public static void menu(){
 
 
     //listen for input
-    Scanner scanner = new Scanner(System.in);
-    String input = scanner.next();
+    Scanner scanner = IO.getScanner();
+    String input = scanner.nextLine();
 
     try{
       int number = Integer.parseInt(input);
@@ -132,16 +132,21 @@ public static void menu(){
 
 }
 
+    public static void main(String args[]){
+        login();
+        try{
+            // Initialize "global" scanner
+            Scanner scanner = IO.getScanner("test.txt");
+            menu();
+        }catch(NoSuchElementException e){
+            System.out.println("End of tests, returning to stdin.");
 
-
-
-
-public static void main(String args[]){
-
-  login();
-  menu();
-  System.out.println("Bye! :D");
+            Scanner scanner = IO.resetScanner();
+            menu();
+        }
+            
+        System.out.println("Bye! :D");
   
  
-}//end of main
+    }//end of main
 }

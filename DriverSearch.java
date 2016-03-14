@@ -3,7 +3,7 @@ import java.sql.*;
 import java.io.*;
 
 public class DriverSearch{
-    Scanner scanner = new Scanner(System.in);
+    Scanner scanner = IO.getScanner();
     Helpers h = new Helpers();
     Statement s;
     final String STRING_TYPE = "String";
@@ -16,12 +16,12 @@ public class DriverSearch{
         **/
 
         while(true){
-            System.out.println("Driver Search:\n" +
-                               "Select an option:\n" +
-                               "1- Search by licence number\n" +
-                               "2- Search by name\n" +
-                               "3- Return to search engine menu\n" +
-                               "4- Return to main menu");       
+            System.out.println("+--------------------Driver Search--------------------+\n" +
+                               "   Select an option:\n" +
+                               "     1- Search by licence number\n" +
+                               "     2- Search by name\n" +
+                               "     3- Return to search engine menu\n" +
+                               "     4- Return to main menu");       
 
             String input = scanner.nextLine();
             boolean succ = false;
@@ -161,7 +161,7 @@ public class DriverSearch{
 
         Map<String,DriverObj> m = new HashMap<>();
         String s = new String();
-        
+        java.sql.Date date;
         try{
             // While records to process
             while(rs.next()){
@@ -178,14 +178,14 @@ public class DriverSearch{
                     s = rs.getString("addr");
                     d.setAddr(s);
 
-                    s = rs.getString("birthday");
-                    d.setBirthday(s);
+                    date = rs.getDate("birthday");
+                    d.setBirthday(date);
 
                     s = rs.getString("class");
                     d.setDrivingClass(s);
 
-                    s = rs.getString("expiring_date");
-                    d.setExpiryDate(s);
+                    date = rs.getDate("expiring_date");
+                    d.setExpiryDate(date);
                 }
                 
                 // Add driving condition descriptions
@@ -209,7 +209,7 @@ public class DriverSearch{
         DriverObj d;
         for(String k: m.keySet()){
             d = m.get(k);
-            d.printAll();            
+            d.printRecord();            
         }
         System.out.println();
     }
