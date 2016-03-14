@@ -13,14 +13,16 @@ import java.io.*;
 public class DriverReg{
   Scanner scanner;
   Helpers h;
-
+  DriverObj dL;
+  
   final String STRING_TYPE = "String";
   final String NUM_TYPE = "Integer";
-
+  final String DATE_TYPE = "Date";
 
 public DriverReg(){
   scanner = new Scanner(System.in);
   h = new Helpers();
+  dL = new DriverObj();
 }
 
 //displays the menu for driver licence registration
@@ -60,7 +62,7 @@ public void addLicence(){
     String i;
 
     while(true){
-      System.out.print("Serial number(15): ");
+      System.out.print("Licence Number(15): ");
       i = scanner.nextLine();
       if(i.isEmpty()) i=null;
 
@@ -78,8 +80,120 @@ public void addLicence(){
 
     }
 
-    vehicle.setSerialNo(i);
+    dL.setLicenceNo(i);
+
+    while(true){
+      System.out.print("Sin(15): ");
+      i = scanner.nextLine();
+      if(i.isEmpty()) i=null;
+      try{
+        h.checkValidity(i, 15, STRING_TYPE, false);
+        break;
+      }catch(CantBeNullException e){
+        System.out.println("Entry cannot be null!");
+      }catch(TooLongException e){
+        System.out.println("Entry too long!");
+      }catch(NumberFormatException e){
+        System.out.println("Entry in the wrong format!");
+      }
+    }
+
+    dL.setSin(i);
     
+    while(true){
+      System.out.print("Class(10): ");
+      i = scanner.nextLine();
+      if(i.isEmpty()) i=null;
+      try{
+        h.checkValidity(i, 10, STRING_TYPE, true);
+        break;
+      }catch(CantBeNullException e){
+        System.out.println("Entry cannot be null!");
+      }catch(TooLongException e){
+        System.out.println("Entry too long!");
+      }catch(NumberFormatException e){
+        System.out.println("Entry in the wrong format!");
+      }
+    }
+
+    dL.setDrivingClass(i);
+    
+    while(true){
+      System.out.print("Photo: ");
+      i = scanner.nextLine();
+      if(i.isEmpty()) i=null;
+      try{
+        h.checkValidity(i, 50, STRING_TYPE, true); //how do you check a photo's validity?
+        break;
+      }catch(CantBeNullException e){
+        System.out.println("Entry cannot be null!");
+      }catch(TooLongException e){
+        System.out.println("Entry too long!");
+      }catch(NumberFormatException e){
+        System.out.println("Entry in the wrong format!");
+      }
+
+    }
+
+    dL.setPhoto(i); 
+
+    java.sql.Date myDate = null;
+    boolean dateFlag=false;
+    
+    while(true){
+      System.out.print("Issue Date(yyyy-mm-dd): ");
+      i = scanner.nextLine();
+      if(i.isEmpty()) i = null; 
+      try{
+        h.checkDate(i, 10, DATE_TYPE); 
+        break;
+      }catch(DateFormatException e){
+        System.out.println("Entry in the wrong format. Expected yyyy-mm-dd!");
+      }catch(TooLongException e){
+        System.out.println("Entry too long!");
+      }catch(NumberFormatException e){
+        System.out.println("No letters in the date please!");
+      }catch(DateIsNullException e){
+        dateFlag = true;
+        break;
+      }
+
+    }
+
+    if(dateFlag) dL.setIssueDate(myDate);
+    else dL.setIssueDate(java.sql.Date.valueOf(i));
+
+    dateFlag=false;
+    
+    while(true){
+      System.out.print("Expiration Date(yyyy-mm-dd): ");
+      i = scanner.nextLine();
+      if(i.isEmpty()) i=null;
+      try{
+        h.checkDate(i, 10, DATE_TYPE);
+        break;
+      }catch(DateFormatException e){
+        System.out.println("Entry in the wrong format. Expected yyyy-mm-dd!");
+      }catch(TooLongException e){
+        System.out.println("Entry too long!");
+      }catch(NumberFormatException e){
+        System.out.println("No letters in the date please!");
+      }catch(DateIsNullException e){
+        dateFlag = true;
+        break;
+      }
+      
+
+    }
+    
+    if(dateFlag) dL.setExpiryDate(myDate);
+    else dL.setExpiryDate(java.sql.Date.valueOf(i));
+
+    System.out.println("Data entered: ");
+    dL.printAllReg();
+    System.out.println("\nWas there a mistake? Y/N or Q to quit (will not upload to database.)");
+    
+    //confirmEntries(dL);
     
   }
 

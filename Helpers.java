@@ -5,7 +5,7 @@ import java.io.*;
 public class Helpers{
   final String STRING_TYPE = "String";
   final String NUM_TYPE = "Integer";
-  
+  final String DATE_TYPE = "Date";
 
 //checks if the given input is the right length, type, and if it can be left null
 public void checkValidity(String input, int length, String type, boolean canBeNull) throws CantBeNullException, TooLongException, NumberFormatException{
@@ -26,13 +26,62 @@ public void checkValidity(String input, int length, String type, boolean canBeNu
     
     if(input!=null){
     //it's a string type of some sort, it's ok if it has numbers mixed in
+      if(input.length() > length)
+        throw new TooLongException();
+      }
+
+
+} //end of checkValidity
+
+//checks the date's validity. 
+public void checkDate(String input, int length, String type) throws TooLongException, NumberFormatException, DateIsNullException, DateFormatException{
+
+  //can the input be null
+  if(input == null){
+    if(type == DATE_TYPE){
+      //this exception will be used just to set a flag
+      //catch it in your own code and set a sql.date object as null, if
+      //you are using that object type
+      throw new DateIsNullException();
+    }
+  }
+
+  
+  if(input!=null){
+    //it's a string type of some sort, it's ok if it has numbers mixed in
     if(input.length() > length)
       throw new TooLongException();
-    }
     
-  } //end of checkValidity
+    if(type == DATE_TYPE){
+      //make sure the date can be valid
+      //expected form: yyyy-mm-dd
+      if(input.contains("-")){
+        String []parts = input.split("-");
+        
+        if(parts.length != 3) throw new DateFormatException();
 
+        //check that we got numbers - throws an exception if not a number
+        int count=0;
+        while(count < 3){
+          Integer.parseInt(parts[count]);
+          count++;
+        }
 
+        //got here, know we have numbers - but are they valid numbers?
+        //just letting people do whatever with the year, go wild
+        if(parts[0].length() != 4) throw new DateFormatException();
+        if(parts[1].length() !=2 || Integer.parseInt(parts[1]) > 12) throw new DateFormatException();
+        if(parts[2].length() !=2 || Integer.parseInt(parts[2]) > 24) throw new DateFormatException();
+        
+      }else{
+        throw new DateFormatException();
+      }
+
+    }
+  }
+}
+
+  
   //checks if a user-entered foreign key (assuming primary) is valid
   //checks only one column at a time
   //isNum is for whether or not the value to check is a number (no quotations req'd) or a string(need '') 
@@ -101,11 +150,6 @@ public void checkValidity(String input, int length, String type, boolean canBeNu
 
     if(check)return true;
     else return false;
-    
-    
-
-
-      
   }
 }
 

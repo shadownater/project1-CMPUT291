@@ -54,6 +54,7 @@ public static void menu(){
   VehicleReg v = new VehicleReg();
   AutoTrans transaction = new AutoTrans();
   SearchEngine search = new SearchEngine();
+  DriverReg dLReg = new DriverReg();
   System.out.println("-----------------------------------------------------");
   
   System.out.println("Welcome to the Auto Registration System!\n Please select an option to begin:");
@@ -91,7 +92,7 @@ public static void menu(){
         
       case 3:
         System.out.println("Welcome to Driver Licence Registration Menu!");
-
+        dLReg.driverRegMenu();
         //returning from Driver Licence Reg - go back to the main menu
         System.out.println();
         menu();
