@@ -87,7 +87,8 @@ public void addLicence(){
       i = scanner.nextLine();
       if(i.isEmpty()) i=null;
       try{
-        h.checkValidity(i, 15, STRING_TYPE, false);
+        h.checkValidity(i, 15, STRING_TYPE, true);
+        h.checkFK(i, "people", "sin", false, true);
         break;
       }catch(CantBeNullException e){
         System.out.println("Entry cannot be null!");
@@ -95,6 +96,21 @@ public void addLicence(){
         System.out.println("Entry too long!");
       }catch(NumberFormatException e){
         System.out.println("Entry in the wrong format!");
+      }catch(FKException e){
+        System.out.println("Person is not in the table. Add a person instead? Y/N\n" +
+                           "This will begin the add person program instead.");
+
+        String response = scanner.nextLine();
+  
+        if(response.equalsIgnoreCase("Y") || response.equalsIgnoreCase("N")){
+          switch(response.toLowerCase()){
+          case "y":
+            //addPeople(); //will return to this menu afterward you make one, idk if i want that
+            break;
+          }
+        }
+
+        
       }
     }
 
@@ -118,21 +134,16 @@ public void addLicence(){
 
     dL.setDrivingClass(i);
     
+    
     while(true){
       System.out.print("Photo: ");
       i = scanner.nextLine();
       if(i.isEmpty()) i=null;
-      try{
-        h.checkValidity(i, 50, STRING_TYPE, true); //how do you check a photo's validity?
-        break;
-      }catch(CantBeNullException e){
-        System.out.println("Entry cannot be null!");
-      }catch(TooLongException e){
-        System.out.println("Entry too long!");
-      }catch(NumberFormatException e){
-        System.out.println("Entry in the wrong format!");
-      }
-
+      
+        boolean isValidPhoto= h.checkPhoto(i); 
+        if(isValidPhoto)
+          break;
+        else System.out.println("Photo is not valid. Please try again.");
     }
 
     dL.setPhoto(i); 
@@ -193,9 +204,80 @@ public void addLicence(){
     dL.printAllReg();
     System.out.println("\nWas there a mistake? Y/N or Q to quit (will not upload to database.)");
     
-    //confirmEntries(dL);
+    confirmEntries(dL);
     
+}//end of addLicence
+
+//does the orderly stuff for the driver's licence registration **same title as the one for person, person has its own
+public void confirmEntries(DriverObj drive){
+
+    String isOk = scanner.nextLine();
+  
+  if(isOk.equalsIgnoreCase("Y") || isOk.equalsIgnoreCase("N") || isOk.equalsIgnoreCase("Q")){
+    switch(isOk.toLowerCase()){
+    case "y":
+      addLicence();
+      break;
+      
+    case "n":
+      //**upload data to database here!
+      
+      if(!checkDriver(drive)){
+        //commitDriver(drive); **write after
+      }
+         else System.out.println("Driver's licence already exists in the database. Please try again."); 
+      break;  
+    case "q":
+      break; 
+    }
+    
+  }else{
+    System.out.println("Invalid input! Please try again.");
+    confirmEntries(drive);
+  }
   }
 
+
+  //checks if the primary and unique keys are already in the database for the driver's licence
+public boolean checkDriver(DriverObj d){
+  //need to check primary key and unique key together
+  //it's NOT ok if there are multiple sins (but can be null)
+  //it's NOT ok if there are multiple licence_no's 
+
+  boolean duh = true;
+  String query;
+  
+  if(d.getSin() !=null){
+    
+    query = "select licence_no, sin from Drive_licence" +
+      " where UPPER(licence_no) ='" + d.getLicenceNo().toUpperCase() +
+      "' and UPPER(sin)='" + d.getSin().toUpperCase() + "'";
+  }else{
+    //get in here if sin is listed as null
+    query = "select licence_no, sin from Drive_licence" +
+      " where UPPER(licence_no) ='" + d.getLicenceNo().toUpperCase() +
+      "' and sin is null";
+  }
+  
+  
+  try{
+    
+    ResultSet rs = Login.stmt.executeQuery(query);
+    
+    //check if returned anything or not
+    
+    duh = rs.next();
+    
+    
+  }catch(SQLException ex) {
+    System.err.println("SQLException: " +
+                       ex.getMessage());
+  }
+  
+  if(duh)return true;
+  else return false;
+  
+  
+}//end of checkDriver
 
 }

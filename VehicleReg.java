@@ -377,7 +377,8 @@ public void addOwner(){
     }catch(NumberFormatException e){
       System.out.println("Entry in the wrong format!");
     }catch(FKException e){
-    System.out.println("Entry does not exist in people table. Add to people table? Y/N");
+    System.out.println("Entry does not exist in people table. Add to people table? Y/N\n" +
+                       "Please note that this option will not allow you to add further details about the person. See option 3 in the main menu for adding people.");
 
     String response = scanner.nextLine();
   

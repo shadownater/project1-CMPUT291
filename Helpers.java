@@ -81,6 +81,20 @@ public void checkDate(String input, int length, String type) throws TooLongExcep
   }
 }
 
+  //check if the photo exists by opening the file; it's fine if it is null
+  public boolean checkPhoto(String f){
+
+    if(f==null)return true;
+    
+    File file = new File(f);
+    if(file.exists())
+      return true;
+    else return false;
+  }
+
+
+
+
   
   //checks if a user-entered foreign key (assuming primary) is valid
   //checks only one column at a time
