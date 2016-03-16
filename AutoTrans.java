@@ -17,7 +17,6 @@ public class AutoTrans{
   Helpers h;
   TransactionObj trans;
 
-
 public AutoTrans() {
   scanner = new Scanner(System.in);
   h = new Helpers();
@@ -49,6 +48,9 @@ public void addTransaction() {
   // Initialize use variables
   float n;
   String i;
+  String s;
+  String query;
+  ResultSet rs;
   // Begin asking user for input:
   System.out.print("Please fill out the following details in the alotted amount of space:\n");
 
@@ -60,7 +62,6 @@ public void addTransaction() {
     System.out.print("(15 characters)              | Vehicle Id: ");
     i = scanner.nextLine();
     if(i.isEmpty()) i=null;
-    // TODO: Check if vehicle exists, give user mainMenu or try again options
     try {
       h.checkValidity(i, 15, "String", false);
       break;
@@ -71,7 +72,22 @@ public void addTransaction() {
     } catch(NumberFormatException e) {
       System.out.println("Please enter a valid Vehicle Id: ");
     }
-  }
+  }    
+    // TODO: Check if vehicle exists, give user mainMenu or try again option
+  /*try {
+    query = "SELECT serial_no FROM vehicle where serial_no == " + i;
+    rs = Login.stmt.executeQuery(query);
+    while(rs.next()) {
+      String id = rs.getString("serial_no");
+      //if (id == i) {
+      System.out.println(id);
+    }
+  } catch (SQLException ex) {
+    System.out.println("Vehicle does not exist. Register the vehicle fisrt.");
+    autoTransMenu();
+    //System.err.println("SQLException: " + ex.getMessage());
+    }*/
+  
   // Everything checks out, set the Vehicle Id
   trans.setVehicleId(i);
 
