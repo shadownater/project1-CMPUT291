@@ -22,7 +22,7 @@ public class DriverSearch{
     //                   false
     //                     -if user selects "Return to main menu"
     public boolean driverSearchMenu(){
-        // outer loop to prompt user
+        // loop to prompt user
         while(true){
             System.out.println("+--------------------Driver Search--------------------+\n" +
                                "   Select an option:\n" +
@@ -105,9 +105,11 @@ public class DriverSearch{
                 }else if(input.equals("3")){
                     // still using search, so searching = true
                     return true;
+                    
                 }else if(input.equals("4")){
                     // finished with search, so searching = false
                     return false;
+                    
                 }else{
                     System.out.println("That is not a valid input! Try again.");
                 }
@@ -116,19 +118,16 @@ public class DriverSearch{
         }
     }
 
+    // driverSearch: generates and executes query, calls parseDriverSearch
+    //               then calls printDriverSearch
+    //        input: name, licenceNo. These are strings to used to generate
+    //               the queries' WHERE clause; only one of these
+    //               should be passed per call.
+    //      returns: true
+    //                 -if search sucessful(results found)
+    //               false
+    //                 -otherwise.   
     public boolean driverSearch(String name, String licenceNo){
-        /**
-             Idea: This is the main driver search, 
-             searches by licenceNo or name.
-                   Calls parseDriverSearch, then printDriverSearch
-             
-             Input: name or licenceNo (both case insensitive)
-                    use "" as unkown value
-
-             Returns: true if successful, false if no matches found
-
-         **/
-        
         String query;
         ResultSet rs;
         
@@ -144,10 +143,7 @@ public class DriverSearch{
         query += "\'" + licenceNo.toLowerCase() + "\'" + " OR LOWER(name) = ";
         query += "\'" + name.toLowerCase() + "\')";
 
-        // Debug statement print out **-KG
-        // System.out.println(query);
-
-        // try to find the licence
+        // Try to execute query
         try{
             rs = Login.stmt.executeQuery(query);
             // Check if any results
@@ -169,20 +165,28 @@ public class DriverSearch{
         }
     }
 
+    // parseDriverSearch: takes a resultSet rs and stores the info in
+    //                    >=1 DriverObj instance(s)
+    //             input: ResultSet rs
+    //           returns: Map containing >= 1 DriverObj instance(s)
     public Map<String,DriverObj> parseDriverSearch(ResultSet rs){
         // Use a map to hold drivers, keys are licence_no
-
         Map<String,DriverObj> m = new HashMap<>();
         String s = new String();
         java.sql.Date date;
+
         try{
             // While records to process
             while(rs.next()){
+
                 // Check if we've made this driverObj yet
                 s = rs.getString("licence_no");
-                DriverObj d = new DriverObj();                
+                DriverObj d = new DriverObj();     
                 if (!m.containsKey(s)){
+                    // Populate the object                    
                     d.setLicenceNo(s);
+
+                    // Add object to map
                     m.put(s,d);
                     
                     s = rs.getString("name");
@@ -201,23 +205,28 @@ public class DriverSearch{
                     d.setExpiryDate(date);
                 }
                 
-                // Add driving condition descriptions
+                // Add driving condition descriptions (multi-value attribute)
                 s = rs.getString("description");
                 if(s != null){
                     s = rs.getString("licence_no");
                     d = m.get(s);
                     s = rs.getString("description");
                     d.addDrivingCondition(s);
-                }                
+                }
             }
             
         }catch(SQLException e){
             System.err.println("SQLException: " +
                                e.getMessage());                
-        }        
+        }
+
+        // Return the map to callee
         return m;
     }
 
+    // printDriverResults: given a map of DriverObj(s), prints the records
+    //              input: map containing DriverObj(s)
+    //            returns: none
     public void printDriverResults(Map<String,DriverObj> m){
         DriverObj d;
         for(String k: m.keySet()){
