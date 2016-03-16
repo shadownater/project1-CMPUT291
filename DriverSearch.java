@@ -2,19 +2,27 @@ import java.util.*;
 import java.sql.*;
 import java.io.*;
 
+//   Driver Search:
+//
+//   Specification:
+//        -Lists: name, licence_no, addr, birthday, 
+//                driving class, driving_condition, expiry_date
+//        -Query by: licence_no or name
 public class DriverSearch{
     Scanner scanner = IO.getScanner();
     Helpers h = new Helpers();
-    Statement s;
     final String STRING_TYPE = "String";
-    
+
+    // driverSearchMenu: provides user navigation, prompts user input,
+    //                   validates input, calls driverSearch
+    //            input: none
+    //          returns: true
+    //                     -if a sucessful search completed
+    //                     -if user selects "Return to search menu"
+    //                   false
+    //                     -if user selects "Return to main menu"
     public boolean driverSearchMenu(){
-        /**
-           Idea: user picks criteria, enters search term, calls driverSearch
-
-           Returns: true if still search
-        **/
-
+        // outer loop to prompt user
         while(true){
             System.out.println("+--------------------Driver Search--------------------+\n" +
                                "   Select an option:\n" +
@@ -25,7 +33,8 @@ public class DriverSearch{
 
             String input = scanner.nextLine();
             boolean succ = false;
-            
+
+            // loop to prompt/get user input
             while(true){
                 if(input.equals("1")){
                     String name = ""; 
@@ -34,6 +43,8 @@ public class DriverSearch{
                     // Check validity of user search criteria, l is valid length
                     int l=15;
                     String prompt = "Licence(15): ";
+
+                    // loop to validate user input
                     while(true){
                         System.out.print(prompt);
                         i = scanner.nextLine();
@@ -65,6 +76,8 @@ public class DriverSearch{
                     // Check validity of user search criteria, l is valid length
                     int l=40;
                     String prompt = "Name(40): ";        
+
+                    // loop to validate user input
                     while(true){
                         System.out.print(prompt);
                         i = scanner.nextLine();
