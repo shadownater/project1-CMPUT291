@@ -2,12 +2,22 @@ import java.util.*;
 import java.sql.*;
 import java.io.*;
 
+/**
+   Driver Search:
+
+   Specification:
+        -Lists: name, licence_no, addr, birthday, 
+                driving class, driving_condition, expiry_date
+        -Query by: licence_no or name
+ **/
+
 public class DriverSearch{
     Scanner scanner = IO.getScanner();
     Helpers h = new Helpers();
-    Statement s;
     final String STRING_TYPE = "String";
-    
+
+    //Statement s;
+
     public boolean driverSearchMenu(){
         /**
            Idea: user picks criteria, enters search term, calls driverSearch

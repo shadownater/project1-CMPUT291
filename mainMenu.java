@@ -107,7 +107,6 @@ public static void menu(){
         break;
         
       case 5:
-        System.out.println("Welcome to the Search Engine!");
         search.searchMenu();
         
         //returning from search - go back to the main menu
