@@ -280,4 +280,55 @@ public boolean checkDriver(DriverObj d){
   
 }//end of checkDriver
 
+//function used to ask the user for info to add people to the people table
+public void addPeople(){
+  System.out.println("Please enter the person's information, ONE LINE AT A TIME, as such: \n" + "Sin number(15), name(40), height(5,2), weight(5,2), eyecolor(10),\n" + "hair color(10), address(50), gender(m/f), birthday(yyyy-mm-dd).\n" + "Please note: the sin number cannot be blank.\n");
+
+  String i;
+
+  while(true){
+    System.out.print("Sin number(15): ");
+    i = scanner.nextLine();
+    if(i.isEmpty()) i=null;
+
+    try{
+      h.checkValidity(i, 15, STRING_TYPE, false);
+      //check if that primary key is available or not
+      break;
+    }catch(CantBeNullException e){
+      System.out.println("Entry cannot be null!");
+    }catch(TooLongException e){
+      System.out.println("Entry too long!");
+    }catch(NumberFormatException e){
+      System.out.println("Entry in the wrong format!");
+    }
+
+  }
+
+  //person.setSinNo(i);
+  
+  while(true){
+    System.out.print("Maker(20): ");
+    i = scanner.nextLine();
+    if(i.isEmpty()) i=null;
+    try{
+      h.checkValidity(i, 20, STRING_TYPE, true);
+      break;
+    }catch(CantBeNullException e){
+      System.out.println("Entry cannot be null!");
+    }catch(TooLongException e){
+      System.out.println("Entry too long!");
+    }catch(NumberFormatException e){
+      System.out.println("Entry in the wrong format!");
+    }
+
+  }
+
+  //person.setMaker(i);
+  
+  
+
+  
+}//end of addPeople
+  
 }
