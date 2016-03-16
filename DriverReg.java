@@ -454,12 +454,14 @@ public void addPeople(){
   person.setAddress(i);
 
   while(true){
-    System.out.print("Gender(m/f): "); //**put the m/f check in here!!
+    System.out.print("Gender(m/f): "); 
     i = scanner.nextLine();
     if(i.isEmpty()) i=null;
     try{
       h.checkValidity(i, 1, STRING_TYPE, true);
-      break;
+      if(i.equalsIgnoreCase("M") || i.equalsIgnoreCase("F")){
+        break;
+      }else System.out.println("Entry must be m or f.");
     }catch(CantBeNullException e){
       System.out.println("Entry cannot be null!");
     }catch(TooLongException e){
