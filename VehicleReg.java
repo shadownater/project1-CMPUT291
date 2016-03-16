@@ -221,6 +221,7 @@ public void addVehicle(){
 
   vehicle.setColour(i);
   boolean bah=false;
+  String found =null;
   
   while(true){
   System.out.print("Type ID(38): ");
@@ -228,7 +229,7 @@ public void addVehicle(){
   if(i.isEmpty()) i=null;
   try{
   h.checkValidity(i, 38, NUM_TYPE, true);
-  h.checkFK(i, "vehicle_type", "type_id", true, true);
+  found = h.checkFK(i, "vehicle_type", "type_id", true, true);
   break;
   }catch(CantBeNullException e){
     System.out.println("Entry cannot be null!");
@@ -252,8 +253,9 @@ public void addVehicle(){
   }//end of catch
   if(bah)break;
   }//end of while
-  
-  vehicle.setType_Id(i);
+
+  if(found==null) vehicle.setType_Id(i);
+  else vehicle.setType_Id(found);
 
   System.out.println("Data entered: ");
   vehicle.printAll();
@@ -361,6 +363,7 @@ public void addOwner(){
   
   String i;
   boolean c1 =false, c2 = false;
+  String found=null;
   
   while(true){
     System.out.print("Owner ID(15): ");
@@ -368,7 +371,7 @@ public void addOwner(){
     if(i.isEmpty()) i=null;
     try{
       h.checkValidity(i, 15, STRING_TYPE, false);
-      h.checkFK(i, "people", "sin", false, false);
+      found = h.checkFK(i, "people", "sin", false, false);
       break;
     }catch(CantBeNullException e){
       System.out.println("Entry cannot be null!");
@@ -395,16 +398,19 @@ public void addOwner(){
   }//end of catch
     if(c1)break;
   }
-  
-  owner.setOwnerId(i); 
 
+  if(found==null) owner.setOwnerId(i);
+  else owner.setOwnerId(found); 
+
+  found = null;
+  
   while(true){
   System.out.print("Vehicle ID(15): ");
   i = scanner.nextLine();
   if(i.isEmpty()) i=null;
   try{
     h.checkValidity(i, 15, STRING_TYPE, false);
-    h.checkFK(i, "vehicle", "serial_no", false, false);
+    found = h.checkFK(i, "vehicle", "serial_no", false, false);
     break;
   }catch(CantBeNullException e){
     System.out.println("Entry cannot be null!");
@@ -421,14 +427,15 @@ public void addOwner(){
     switch(response.toLowerCase()){
     case "y":
       addVehicle();
-      break;
+      return;
+      //break;
     }//end of switch 
   }//end of if statement
   }//end of catch
   
   }
-
-  owner.setVehicleId(i);
+  if(found==null) owner.setVehicleId(i);
+  else owner.setVehicleId(found);
   
   while(true){
   System.out.print("Primary Owner?(y/n): ");

@@ -99,10 +99,13 @@ public void checkDate(String input, int length, String type) throws TooLongExcep
   //checks if a user-entered foreign key (assuming primary) is valid
   //checks only one column at a time
   //isNum is for whether or not the value to check is a number (no quotations req'd) or a string(need '') 
-  public void checkFK(String enteredValue, String fTable, String col, boolean isNum, boolean canBeNull)throws FKException{
+  public String checkFK(String enteredValue, String fTable, String col, boolean isNum, boolean canBeNull)throws FKException{
 
+    ResultSet rs;
+    String value=null;
+    
     if(enteredValue==null && canBeNull)
-      return;
+      return null;
     
     //performs a small query to check if the foreign key is in the other table
     String query = "select " + col + " from " + fTable + " where UPPER(" + col + ")=";
@@ -112,18 +115,43 @@ public void checkDate(String input, int length, String type) throws TooLongExcep
     else query += "'" + enteredValue.toUpperCase() + "'"; 
     
     try{
-      ResultSet rs = Login.stmt.executeQuery(query);
+      rs = Login.stmt.executeQuery(query);
 
       //check if returned anything or not
 
       anything = rs.next();
 
+
+      if(anything){
+        if(isNum){
+
+          value = Integer.toString(rs.getInt(col));
+        }else{
+        
+          value = rs.getString(col);
+        }
+      }else throw new FKException();
+      
        }catch(SQLException ex) {
       System.err.println("SQLException: " +
                        ex.getMessage());
       }
-    if(!anything) throw new FKException();
+
+    return value;
     
+    /*if(anything){
+      String value;
+      if(isNum){
+        
+        return value;
+        }
+      
+      
+        value = rs.getString(col);
+      
+      return value;
+    }else throw new FKException();
+    */
 
     
   }

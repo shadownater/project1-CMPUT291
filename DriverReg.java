@@ -14,6 +14,7 @@ public class DriverReg{
   Scanner scanner;
   Helpers h;
   DriverObj dL;
+  PeopleObj person;
   
   final String STRING_TYPE = "String";
   final String NUM_TYPE = "Integer";
@@ -23,6 +24,7 @@ public DriverReg(){
   scanner = new Scanner(System.in);
   h = new Helpers();
   dL = new DriverObj();
+  person = new PeopleObj();
 }
 
 //displays the menu for driver licence registration
@@ -42,7 +44,7 @@ public void driverRegMenu(){
       break;
 
     case "p":
-      //addPersonMenu();
+      addPeople();
     }
 
   }else{
@@ -105,7 +107,7 @@ public void addLicence(){
         if(response.equalsIgnoreCase("Y") || response.equalsIgnoreCase("N")){
           switch(response.toLowerCase()){
           case "y":
-            //addPeople(); //will return to this menu afterward you make one, idk if i want that
+            addPeople(); //will return to this menu afterward you make one, idk if i want that
             break;
           }
         }
@@ -238,6 +240,37 @@ public void confirmEntries(DriverObj drive){
   }
 
 
+//does the orderly stuff for the driver's licence registration **same title as 
+//the one for drive_licence, it has its own
+public void confirmEntries(PeopleObj peep){
+
+    String isOk = scanner.nextLine();
+
+    if(isOk.equalsIgnoreCase("Y") || isOk.equalsIgnoreCase("N") || isOk.equalsIgnoreCase("Q")){
+      switch(isOk.toLowerCase()){
+      case "y":
+        addPeople();
+        break;
+
+      case "n":
+        //**upload data to database here!
+
+        if(!checkPerson(peep)){
+          //commitPerson(peep); **write after
+        }
+        else System.out.println("Driver's licence already exists in the database. Please try again.");
+        break;
+      case "q":
+        break;
+      }
+
+    }else{
+      System.out.println("Invalid input! Please try again.");
+      confirmEntries(peep);
+    }
+  }
+  
+  
   //checks if the primary and unique keys are already in the database for the driver's licence
 public boolean checkDriver(DriverObj d){
   //need to check primary key and unique key together
@@ -305,14 +338,14 @@ public void addPeople(){
 
   }
 
-  //person.setSinNo(i);
+  person.setSinNo(i);
   
   while(true){
-    System.out.print("Maker(20): ");
+    System.out.print("Name(40): ");
     i = scanner.nextLine();
     if(i.isEmpty()) i=null;
     try{
-      h.checkValidity(i, 20, STRING_TYPE, true);
+      h.checkValidity(i, 40, STRING_TYPE, true);
       break;
     }catch(CantBeNullException e){
       System.out.println("Entry cannot be null!");
@@ -324,11 +357,162 @@ public void addPeople(){
 
   }
 
-  //person.setMaker(i);
+  person.setName(i);
   
+  while(true){
+    System.out.print("Height(5,2): ");
+    i = scanner.nextLine();
+    if(i.isEmpty()) i=null;
+    try{
+      h.checkValidity(i, 7, NUM_TYPE, true); //**needs check for proper digit format!
+      break;
+    }catch(CantBeNullException e){
+      System.out.println("Entry cannot be null!");
+    }catch(TooLongException e){
+      System.out.println("Entry too long!");
+    }catch(NumberFormatException e){
+      System.out.println("Entry in the wrong format!");
+    }
+
+  }
+  person.setHeight(i);
+  
+  while(true){
+    System.out.print("Weight(5,2): ");
+    i = scanner.nextLine();
+    if(i.isEmpty()) i=null;
+    try{
+      h.checkValidity(i, 7, NUM_TYPE, true); //**same here!
+      break;
+    }catch(CantBeNullException e){
+      System.out.println("Entry cannot be null!");
+    }catch(TooLongException e){
+      System.out.println("Entry too long!");
+    }catch(NumberFormatException e){
+      System.out.println("Entry in the wrong format!");
+    }
+
+  }
+
+  person.setWeight(i);
+
+  while(true){
+    System.out.print("Eyecolor(10): ");
+    i = scanner.nextLine();
+    if(i.isEmpty()) i=null;
+    try{
+      h.checkValidity(i, 10, STRING_TYPE, true);
+      break;
+    }catch(CantBeNullException e){
+      System.out.println("Entry cannot be null!");
+    }catch(TooLongException e){
+      System.out.println("Entry too long!");
+    }catch(NumberFormatException e){
+      System.out.println("Entry in the wrong format!");
+    }
+
+  }
+  
+  person.setEyecolor(i);
+
+  while(true){
+    System.out.print("Haircolor(10): ");
+    i = scanner.nextLine();
+    if(i.isEmpty()) i=null;
+    try{
+      h.checkValidity(i, 10, STRING_TYPE, true);
+      break;
+    }catch(CantBeNullException e){
+      System.out.println("Entry cannot be null!");
+    }catch(TooLongException e){
+      System.out.println("Entry too long!");
+    }catch(NumberFormatException e){
+      System.out.println("Entry in the wrong format!");
+    }
+
+  }
+  
+  person.setHaircolor(i);
+
+  while(true){
+    System.out.print("Address(50): ");
+    i = scanner.nextLine();
+    if(i.isEmpty()) i=null;
+    try{
+      h.checkValidity(i, 50, STRING_TYPE, true);
+      break;
+    }catch(CantBeNullException e){
+      System.out.println("Entry cannot be null!");
+    }catch(TooLongException e){
+      System.out.println("Entry too long!");
+    }catch(NumberFormatException e){
+      System.out.println("Entry in the wrong format!");
+    }
+
+  }
+
+  person.setAddress(i);
+
+  while(true){
+    System.out.print("Gender(m/f): "); 
+    i = scanner.nextLine();
+    if(i.isEmpty()) i=null;
+    try{
+      h.checkValidity(i, 1, STRING_TYPE, true);
+      if(i.equalsIgnoreCase("M") || i.equalsIgnoreCase("F")){
+        break;
+      }else System.out.println("Entry must be m or f.");
+    }catch(CantBeNullException e){
+      System.out.println("Entry cannot be null!");
+    }catch(TooLongException e){
+      System.out.println("Entry too long!");
+    }catch(NumberFormatException e){
+      System.out.println("Entry in the wrong format!");
+    }
+
+  }
+
+  person.setGender(i);
+  java.sql.Date myDate=null;
+  boolean dateFlag = false;
+  
+  while(true){
+    System.out.print("Birthday(yyyy-mm-dd): ");
+    i = scanner.nextLine();
+    if(i.isEmpty()) i=null;
+    try{
+      h.checkDate(i, 10, DATE_TYPE); 
+      break;
+    }catch(TooLongException e){
+      System.out.println("Entry too long!");
+    }catch(NumberFormatException e){
+      System.out.println("Entry in the wrong format!");
+    }catch(DateFormatException e){
+      System.out.println("No letters in the date please!");
+    }catch(DateIsNullException e){
+      dateFlag = true;
+      break;
+    }
+
+  }
+
+  if(dateFlag) person.setBirthday(myDate);
+  else person.setBirthday(java.sql.Date.valueOf(i));
+
+
+  System.out.println("Data entered: ");
+  person.printAll();
+  System.out.println("\nWas there a mistake? Y/N or Q to quit (will not upload to database.)");
+
+  confirmEntries(person);
   
 
   
 }//end of addPeople
+
+public boolean checkPerson(PeopleObj p){
+  return true;
+  
+}
   
 }
