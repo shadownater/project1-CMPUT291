@@ -161,7 +161,7 @@ public class ViolationSearch{
 
         Map<String,ViolationObj> m = new HashMap<>();
         String s = new String();
-        
+        Integer i;
         try{
             // While records to process
             while(rs.next()){
@@ -170,7 +170,7 @@ public class ViolationSearch{
                 ViolationObj d = new ViolationObj();                
 
                 s = rs.getString("ticket_no");
-                d.setTicketNo(s);
+                d.setTicketNo(Integer.parseInt(s));
 
                 m.put(s,d);                
                     
