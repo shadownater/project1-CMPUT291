@@ -22,7 +22,7 @@ public class DriverSearch{
     //                   false
     //                     -if user selects "Return to main menu"
     public boolean driverSearchMenu(){
-        // outer loop to prompt user
+        // loop to prompt user
         while(true){
             System.out.println("+--------------------Driver Search--------------------+\n" +
                                "   Select an option:\n" +
@@ -105,9 +105,11 @@ public class DriverSearch{
                 }else if(input.equals("3")){
                     // still using search, so searching = true
                     return true;
+                    
                 }else if(input.equals("4")){
                     // finished with search, so searching = false
                     return false;
+                    
                 }else{
                     System.out.println("That is not a valid input! Try again.");
                 }
@@ -120,8 +122,8 @@ public class DriverSearch{
     //               then calls printDriverSearch
     //        input: name, licenceNo. These are strings to used to generate
     //               the queries' WHERE clause; only one of these
-    //               should be passed at per call.
-    //       output: true
+    //               should be passed per call.
+    //      returns: true
     //                 -if search sucessful(results found)
     //               false
     //                 -otherwise.   
@@ -166,7 +168,7 @@ public class DriverSearch{
     // parseDriverSearch: takes a resultSet rs and stores the info in
     //                    >=1 DriverObj instance(s)
     //             input: ResultSet rs
-    //            output: Map containing >= 1 driver object instance(s)
+    //           returns: Map containing >= 1 DriverObj instance(s)
     public Map<String,DriverObj> parseDriverSearch(ResultSet rs){
         // Use a map to hold drivers, keys are licence_no
         Map<String,DriverObj> m = new HashMap<>();
@@ -183,6 +185,8 @@ public class DriverSearch{
                 if (!m.containsKey(s)){
                     // Populate the object                    
                     d.setLicenceNo(s);
+
+                    // Add object to map
                     m.put(s,d);
                     
                     s = rs.getString("name");
@@ -222,7 +226,7 @@ public class DriverSearch{
 
     // printDriverResults: given a map of DriverObj(s), prints the records
     //              input: map containing DriverObj(s)
-    //             output: none
+    //            returns: none
     public void printDriverResults(Map<String,DriverObj> m){
         DriverObj d;
         for(String k: m.keySet()){
