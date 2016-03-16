@@ -253,8 +253,9 @@ public void addVehicle(){
   }//end of catch
   if(bah)break;
   }//end of while
-  
-  vehicle.setType_Id(found);
+
+  if(found==null) vehicle.setType_Id(i);
+  else vehicle.setType_Id(found);
 
   System.out.println("Data entered: ");
   vehicle.printAll();
@@ -397,8 +398,10 @@ public void addOwner(){
   }//end of catch
     if(c1)break;
   }
-  
-  owner.setOwnerId(found); 
+
+  if(found==null) owner.setOwnerId(i);
+  else owner.setOwnerId(found); 
+
   found = null;
   
   while(true){
@@ -424,14 +427,15 @@ public void addOwner(){
     switch(response.toLowerCase()){
     case "y":
       addVehicle();
-      break;
+      return;
+      //break;
     }//end of switch 
   }//end of if statement
   }//end of catch
   
   }
-
-  owner.setVehicleId(found);
+  if(found==null) owner.setVehicleId(i);
+  else owner.setVehicleId(found);
   
   while(true){
   System.out.print("Primary Owner?(y/n): ");
