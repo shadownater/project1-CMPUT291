@@ -11,7 +11,7 @@ public class DriverObj{
     List<String> drivingConditions = new ArrayList<String>();
     java.sql.Date expiryDate;
     String sin;
-    String photo;
+    File photo;
     java.sql.Date issueDate;
   
     // Setters
@@ -48,9 +48,9 @@ public class DriverObj{
       sin = input;
     }
 
-   //not sure how to do this yet. Placeholder
     public void setPhoto(String input){
-      photo = input;
+      if(input==null) photo=null;
+      else photo = new File(input);
     }
 
     public void setIssueDate(java.sql.Date input){
@@ -95,7 +95,7 @@ public class DriverObj{
       return sin;
     }
 
-    public String getPhoto(){
+    public File getPhoto(){
       return photo;
     }
 
@@ -112,10 +112,15 @@ public class DriverObj{
 
     // Prints all for the driver's licence registration part
     public void printAllReg(){
+      if(photo!=null){
       System.out.println("" + licenceNo + " " + sin + " " + drivingClass + " " +
+                         "photo file: '" + photo + "' " + issueDate + " " +
+                         expiryDate);
+      }else
+        System.out.println("" + licenceNo + " " + sin + " " + drivingClass + " " +
                          "photo file: " + photo + " " + issueDate + " " +
                          expiryDate);
-    }
+      }
     // Print fancier: try to emulate a real licence to a degree
     public void printRecord(){
         System.out.println("+-----------------------------------------------------+\n" +

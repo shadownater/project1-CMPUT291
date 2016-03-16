@@ -81,6 +81,20 @@ public void checkDate(String input, int length, String type) throws TooLongExcep
   }
 }
 
+  //check if the photo exists by opening the file; it's fine if it is null
+  public boolean checkPhoto(String f){
+
+    if(f==null)return true;
+    
+    File file = new File(f);
+    if(file.exists())
+      return true;
+    else return false;
+  }
+
+
+
+
   
   //checks if a user-entered foreign key (assuming primary) is valid
   //checks only one column at a time
@@ -151,6 +165,62 @@ public void checkDate(String input, int length, String type) throws TooLongExcep
     if(check)return true;
     else return false;
   }
+
+    
+    public boolean checkLicenceExists(String licenceNo){
+        /** 
+            A helper that, when given a licence_no, 
+            returns true if a licence_no exists,
+            false otherwise.
+        **/
+
+        ResultSet rs;
+        String query =
+            "SELECT licence_no FROM drive_licence " +
+            "WHERE LOWER(licence_no) = \'";
+        
+        query += licenceNo.toLowerCase() + "\'";
+
+        try{
+            rs = Login.stmt.executeQuery(query);
+            // Check if any results
+            if (rs.isBeforeFirst()) {
+                return true;
+            }else{
+                return false;
+            }
+        }catch(SQLException ex){
+            System.err.println("SQLException: " + ex.getMessage());
+            return false;
+        }
+    }
+    public boolean checkSinExists(String sin){
+        /** 
+            A helper that when given a licence_no,
+            returns true if a sin exists,
+            false otherwise, 
+        **/
+
+        ResultSet rs;
+        String query =
+            "SELECT sin FROM people WHERE LOWER(sin) = \'";
+        
+        query += sin.toLowerCase() + "\'";
+        
+        try{
+            rs = Login.stmt.executeQuery(query);
+            // Check if any results
+            if (rs.isBeforeFirst()) {
+                return true;
+            }else{
+                return false;
+            }
+        }catch(SQLException ex){
+            System.err.println("SQLException: " + ex.getMessage());
+            return false;
+        }
+    }    
+
 }
 
   
