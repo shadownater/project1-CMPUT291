@@ -3,15 +3,16 @@ import java.sql.*;
 import java.io.*;
 
 public class ViolationObj{
-    String ticketNo;
+    Integer ticketNo;
     String violatorNo;
     String vehicleID;
     String officeNo;
     String vtype;
     String place;
     String descriptions;
+    java.sql.Date vDate;
 
-    public void setTicketNo(String input){
+    public void setTicketNo(Integer input){
         ticketNo = input;
     }
 
@@ -39,7 +40,11 @@ public class ViolationObj{
         descriptions = input;
     }
 
-    public String getTicketNo(){
+    public void setVDate(java.sql.Date date){
+	vDate = date;
+    }
+
+    public Integer getTicketNo(){
         return ticketNo;
     }
 
@@ -67,10 +72,18 @@ public class ViolationObj{
         return descriptions;
     }
 
+    public java.sql.Date getVDate() {
+	return vDate;
+    }
+
     public void printAll(){
-        System.out.println("" + ticketNo + " " + violatorNo +
-                           " " + vehicleID + " " + officeNo +
-                           " " + vtype + " " + place +
-                           " " + descriptions);
+        System.out.println("Ticket#: " + ticketNo + "\nViolator: " + violatorNo +
+                           "\nVehicle Id: " + vehicleID + "\nOfficer Id:  " + officeNo +
+                           "\nViolation: " + vtype + "\nLocation: " + place +
+                           "\nComments: " + descriptions);
+    }
+
+    public void finRecord() {
+	System.out.println("Record Complete!");
     }
 }
