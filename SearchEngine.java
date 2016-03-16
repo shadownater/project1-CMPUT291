@@ -2,29 +2,22 @@ import java.util.*;
 import java.sql.*;
 import java.io.*;
 
-/*
-  Search Engine
-
-    2) Violation Search:
-         -Lists: "violation records" **clarify-KG
-         -Query by: licence_no, sin
-    3) Vehicle Search:
-         -Lists: number of ownership transfers, average sale price, 
-                 number of violations
- */
-
+// Provides search functionality to the application
+// 
 public class SearchEngine{
     
     Scanner scanner = IO.getScanner();
     Helpers h = new Helpers();;
-    Statement stmt;
-
+    final String STRING_TYPE = "String";
+    
     DriverSearch d;
     ViolationSearch v;
     VehicleSearch a;
-    
-    final String STRING_TYPE = "String";
 
+    // searchMenu: provides user navigation and creates the various
+    //             search object instances
+    //      input: none
+    //    returns: none
     public void searchMenu(){
         boolean searching = true;
 
