@@ -103,7 +103,7 @@ public class DriverObj{
       return issueDate;
     }
 
-    // Print 
+    // Simple print function
     public void printAll(){
         System.out.println("" + name + " " + licenceNo + " " + addr +
                            " " + birthday + " " + drivingClass + " " +
@@ -121,7 +121,8 @@ public class DriverObj{
                          "photo file: " + photo + " " + issueDate + " " +
                          expiryDate);
       }
-    // Print fancier: try to emulate a real licence to a degree
+    // Print function: try to emulate a real licence to a degree
+    // 
     public void printRecord(){
         System.out.println("+-----------------------------------------------------+\n" +
                            "|  No: " + licenceNo + "\n" +
