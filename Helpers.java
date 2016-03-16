@@ -165,6 +165,62 @@ public void checkDate(String input, int length, String type) throws TooLongExcep
     if(check)return true;
     else return false;
   }
+
+    
+    public boolean checkLicenceExists(String licenceNo){
+        /** 
+            A helper that, when given a licence_no, 
+            returns true if a licence_no exists,
+            false otherwise.
+        **/
+
+        ResultSet rs;
+        String query =
+            "SELECT licence_no FROM drive_licence " +
+            "WHERE LOWER(licence_no) = \'";
+        
+        query += licenceNo.toLowerCase() + "\'";
+
+        try{
+            rs = Login.stmt.executeQuery(query);
+            // Check if any results
+            if (rs.isBeforeFirst()) {
+                return true;
+            }else{
+                return false;
+            }
+        }catch(SQLException ex){
+            System.err.println("SQLException: " + ex.getMessage());
+            return false;
+        }
+    }
+    public boolean checkSinExists(String sin){
+        /** 
+            A helper that when given a licence_no,
+            returns true if a sin exists,
+            false otherwise, 
+        **/
+
+        ResultSet rs;
+        String query =
+            "SELECT sin FROM people WHERE LOWER(sin) = \'";
+        
+        query += sin.toLowerCase() + "\'";
+        
+        try{
+            rs = Login.stmt.executeQuery(query);
+            // Check if any results
+            if (rs.isBeforeFirst()) {
+                return true;
+            }else{
+                return false;
+            }
+        }catch(SQLException ex){
+            System.err.println("SQLException: " + ex.getMessage());
+            return false;
+        }
+    }    
+
 }
 
   

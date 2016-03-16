@@ -138,8 +138,14 @@ public class ViolationSearch{
                 printViolationResults(m);
                 return true;
             }else{
-                System.out.println("Sorry, no matches found.");
-                System.out.println();
+                if(h.checkLicenceExists(licenceNo) ||
+                   h.checkSinExists(sin)){
+                    System.out.println("No violations found.");
+                    System.out.println();
+                }else{
+                    System.out.println("The provided licence number does not exist.");
+                    System.out.println();
+                }
                 return false;
             }
         }catch(SQLException ex){
@@ -205,5 +211,5 @@ public class ViolationSearch{
             d.printAll();            
         }
         System.out.println();
-    }
+    }    
 }
