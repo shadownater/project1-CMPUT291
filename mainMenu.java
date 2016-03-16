@@ -55,6 +55,7 @@ public static void menu(){
   AutoTrans transaction = new AutoTrans();
   SearchEngine search = new SearchEngine();
   DriverReg dLReg = new DriverReg();
+  ViolationRecord record = new ViolationRecord();
   System.out.println("-----------------------------------------------------");
   
   System.out.println("Welcome to the Auto Registration System!\n Please select an option to begin:");
@@ -100,7 +101,7 @@ public static void menu(){
         
       case 4:
         System.out.println("Welcome to Violation Record Menu!");
-
+	record.violationRecordMenu();
         //returning from Violation Record Menu - go back to the main menu
         System.out.println();
         menu();
