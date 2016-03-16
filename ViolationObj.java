@@ -86,4 +86,16 @@ public class ViolationObj{
     public void finRecord() {
 	System.out.println("Record Complete!");
     }
+
+    public void printRecord(){
+        System.out.println("+-----------------------------------------------------+\n" +
+                           "|  Ticket No. " + ticketNo + "\n" +
+                           "|  Date Issued: " + vDate + "\n" +
+                           "|  Vehicle Id. " + vehicleID + "\n" +
+                           "|  Officer Id. " + officeNo + "\n" +
+                           "|  Violation: " + vtype + "\n" +
+                           "|  Location: " + place + "\n" +
+                           "|  Comments: " + descriptions + "\n" +
+                           "+-----------------------------------------------------+");
+    }
 }

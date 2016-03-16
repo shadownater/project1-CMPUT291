@@ -215,8 +215,8 @@ public class ViolationSearch{
                 s = rs.getString("vtype");
                 d.setVtype(s);
 
-                s = rs.getString("vdate");
-                d.setVtype(s);                    
+                date = rs.getDate("vdate");
+                d.setVDate(date);                    
                     
                 s = rs.getString("place");
                 d.setPlace(s);
@@ -241,7 +241,7 @@ public class ViolationSearch{
         ViolationObj d;
         for(String k: m.keySet()){
             d = m.get(k);
-            d.printAll();            
+            d.printRecord();            
         }
         System.out.println();
     }    
