@@ -2,27 +2,39 @@ import java.util.*;
 import java.sql.*;
 import java.io.*;
 
+// VehicleSearch:
+//
+// Specification:
+//      -Lists: Number of times a vehicle has been sold, the average
+//              sale price of the vehicle, and the number of violations
+//              involving the vehicle
+//      -Query by: vehicle_id (vin)
 public class VehicleSearch{
     Scanner scanner = IO.getScanner();
     Helpers h = new Helpers();
-    Statement s;
     final String STRING_TYPE = "String";
 
+    // vehicleSearchMenu: provides user navigation, prompts user input.
+    //                    validates input calls vehicleSearch
+    //             input: none
+    //           returns: true
+    //                      -if a successful search completed
+    //                      -if user selects "Return to search menu"
+    //                    false
+    //                      -if user selects "Return to main menu"
     public boolean vehicleSearchMenu(){
-        /**
-           Idea: user picks criteria, enters search term, calls vehicleSearch
-         **/
-        
+        // loop to prompt user
         while(true){
-            System.out.println("Vehicle Search:\n" +
-                               "Select an option:\n" +
-                               "1- Search by vehicle serial number\n" +
-                               "2- Return to search engine menu\n" +
-                               "3- Return to main  menu");
+            System.out.println("+--------------------Vehicle Search-------------------+\n" +
+                               "   Select an option:\n" +
+                               "     1- Search by vehicle serial number\n" +
+                               "     2- Return to search engine menu\n" +
+                               "     3- Return to main  menu");
 
             String input = scanner.nextLine();
             boolean succ = false;
-            
+
+            // loop to prompt/get user input
             while(true){
                 if(input.equals("1")){
                     String i = "";
@@ -30,6 +42,8 @@ public class VehicleSearch{
                     // Check validity of user search criteria, l is valid length
                     int l=15;
                     String prompt = "vin(15): ";
+
+                    // loop to validate user input
                     while(true){
                         System.out.print(prompt);
                         i = scanner.nextLine();
@@ -54,9 +68,13 @@ public class VehicleSearch{
                     // if !success, return to VehicleSearchMenu
                     break;
                 }else if(input.equals("2")){
+                    // still using search, so search = true
                     return true;
+                    
                 }else if(input.equals("3")){
+                    // finished with search, so searching = false
                     return false;
+                    
                 }else{
                     System.out.println("That is not a valid input! Try again.");
                 }
@@ -64,20 +82,15 @@ public class VehicleSearch{
             } 
         }
     }
-    
+
+    // vehicleSearch: generates and executes query, calls parseVehicleSearch
+    //                then call printVehicleSearch
+    //         input: String vin, used to generate queries WHERE clause
+    //       returns: true
+    //                  -if search sucessful (results found)
+    //                false
+    //                  -otherwise
     public boolean vehicleSearch(String vin){
-        /**
-             Idea: This is the main vehicle search, searches 
-                   by vehicles serial number (vin)
-                   Calls parseVehicleSearch, then printVehicleResults.
-
-                   
-             Input: sin (case insensitive), 
-
-             Returns: true if successful, false if no matches found
-             
-         **/
-        
         String query;
         ResultSet rs;
         
@@ -98,10 +111,7 @@ public class VehicleSearch{
         query += "\'" + vin.toLowerCase() + "\'" + " OR LOWER(v2) = ";
         query += "\'" + vin.toLowerCase() + "\')";            
 
-        // Debug statement print out **-KG
-        // System.out.println(query);
-
-        // try to find the licence
+        // Try to execute query
         try{
             rs = Login.stmt.executeQuery(query);
             // Check if any results
@@ -122,6 +132,11 @@ public class VehicleSearch{
         }
     }
 
+    // parseVehicleSearch: takes a ResultSet rs and stores the info in
+    //                     >=1 VehicleHistoryObj instance(s),
+    //                     which are then stored in a map    
+    //              input: ResultSet rs
+    //            returns: Map containing VehicleHistoryObj instance(s)
     public Map<String,VehicleHistoryObj> parseVehicleSearch(ResultSet rs){
         // Use a map to hold vehicles, keys are licence_no
 
@@ -131,8 +146,6 @@ public class VehicleSearch{
         try{
             // While records to process
             while(rs.next()){
-                // Check if we've made this VehicleHistoryObj yet
-
                 VehicleHistoryObj d = new VehicleHistoryObj();                
 
                 // Since we outer joined, vin could be in either column
@@ -141,6 +154,7 @@ public class VehicleSearch{
                 
                 d.setVin(s);
 
+                // Add object to map
                 m.put(s,d);                
                     
                 s = rs.getString("sales");
@@ -157,9 +171,14 @@ public class VehicleSearch{
                                e.getMessage());                
         }        
 
+        // Return map to callee
         return m;
     }
 
+    // printVehicleResults: given a map of VehicleHistoryObj(s),
+    //                      prints the records
+    //               input: map containing VehicleHistoryObj
+    //             returns: none
     public void printVehicleResults(Map<String,VehicleHistoryObj> m){
         VehicleHistoryObj d;
         for(String k: m.keySet()){
