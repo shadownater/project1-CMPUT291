@@ -107,8 +107,9 @@ public void addLicence(){
         if(response.equalsIgnoreCase("Y") || response.equalsIgnoreCase("N")){
           switch(response.toLowerCase()){
           case "y":
-            addPeople(); //will return to this menu afterward you make one, idk if i want that
-            break;
+            addPeople();
+            return; //TEST ME
+            //break;
           }
         }
 
@@ -364,7 +365,7 @@ public void addPeople(){
     i = scanner.nextLine();
     if(i.isEmpty()) i=null;
     try{
-      h.checkValidity(i, 7, NUM_TYPE, true); //**needs check for proper digit format!
+      h.checkDecimal(i, 5, 2, true); 
       break;
     }catch(CantBeNullException e){
       System.out.println("Entry cannot be null!");
@@ -382,7 +383,7 @@ public void addPeople(){
     i = scanner.nextLine();
     if(i.isEmpty()) i=null;
     try{
-      h.checkValidity(i, 7, NUM_TYPE, true); //**same here!
+      h.checkDecimal(i, 5, 2, true); 
       break;
     }catch(CantBeNullException e){
       System.out.println("Entry cannot be null!");
@@ -459,9 +460,11 @@ public void addPeople(){
     if(i.isEmpty()) i=null;
     try{
       h.checkValidity(i, 1, STRING_TYPE, true);
-      if(i.equalsIgnoreCase("M") || i.equalsIgnoreCase("F")){
-        break;
+      if(i == null) break;
+        if(i.equalsIgnoreCase("M") || i.equalsIgnoreCase("F")){
+          break;
       }else System.out.println("Entry must be m or f.");
+      
     }catch(CantBeNullException e){
       System.out.println("Entry cannot be null!");
     }catch(TooLongException e){

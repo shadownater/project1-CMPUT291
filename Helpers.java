@@ -139,21 +139,6 @@ public void checkDate(String input, int length, String type) throws TooLongExcep
 
     return value;
     
-    /*if(anything){
-      String value;
-      if(isNum){
-        
-        return value;
-        }
-      
-      
-        value = rs.getString(col);
-      
-      return value;
-    }else throw new FKException();
-    */
-
-    
   }
 
 //checks the primary key for two attributes that are primary keys if they are already a combination
@@ -247,8 +232,51 @@ public void checkDate(String input, int length, String type) throws TooLongExcep
             System.err.println("SQLException: " + ex.getMessage());
             return false;
         }
-    }    
+    }
 
+//function that checks if a NUMBER(x,y) is valid
+//length1 is x, length2 is y.  
+public void checkDecimal(String input, int length1, int length2, boolean canBeNull) throws CantBeNullException, TooLongException, NumberFormatException{
+
+  //can the input be null
+  if(input == null){
+    if(!canBeNull){
+      throw new CantBeNullException();
+    }
+  }
+
+  
+  //input can be null here, make sure it is a number
+    if(input !=null){
+      
+        //will throw NumberFormatException if not a number - caller will catch
+      if(input.contains(".")){
+        
+        String []parts = input.split("\\.");
+
+        
+        if(parts.length != 2) throw new NumberFormatException();
+        
+        //check that we got numbers - throws an exception if not a number
+        int count=0;
+        while(count < 2){
+          Integer.parseInt(parts[count]);
+          count++;
+        }
+        
+        //got here, know we have numbers - but are they valid numbers?
+        //just letting people do whatever with the year, go wild
+        if(parts[0].length() > length1) throw new TooLongException();
+        if(parts[1].length() > length2) throw new TooLongException();
+        
+      }else{
+        throw new NumberFormatException();
+      }
+    }
+
+} //end of checkDecimal
+  
+  
 }
 
   
