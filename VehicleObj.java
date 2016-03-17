@@ -6,10 +6,11 @@ public class VehicleObj{
   String serial_no;
   String maker;
   String model;
-  String year; //storing as string for now
+  String year; 
   String colour;
-  String type_id; //storing as string for now
+  String type_id; 
 
+  //setters              
   public void setSerialNo(String input){
     serial_no = input;
   }
@@ -35,7 +36,7 @@ public class VehicleObj{
   }
 
 
-
+//getters
 public String getSerialNo(){
     return serial_no;
   }

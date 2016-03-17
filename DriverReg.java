@@ -57,8 +57,8 @@ public void addLicence(){
 
   //some new things in here: blob, varchar, date, and unique constraint!
   System.out.println("Please enter the licence information, ONE LINE AT A TIME, as such: \n" +
-                     "Licence number(15), sin(15), class(10), photo, issuing date (yyyy/mm/dd)," +
-                     "expiring date(yyyy/mm/dd).\n" +
+                     "Licence number(15), sin(15), class(10), photo, issuing date (yyyy-mm-dd)," +
+                     "expiring date(yyyy-mm-dd).\n" +
                      "Please note: the licence number cannot be blank.\n");
 
     String i;
@@ -166,7 +166,7 @@ public void addLicence(){
       }catch(TooLongException e){
         System.out.println("Entry too long!");
       }catch(NumberFormatException e){
-        System.out.println("No letters in the date please!");
+        System.out.println("Wrong format!");
       }catch(DateIsNullException e){
         dateFlag = true;
         break;
@@ -257,9 +257,9 @@ public void confirmEntries(PeopleObj peep){
         //**upload data to database here!
 
         if(!checkPerson(peep)){
-          //commitPerson(peep); **write after
+          commitPerson(peep); 
         }
-        else System.out.println("Driver's licence already exists in the database. Please try again.");
+        else System.out.println("Person already exists in the database. Please try again.");
         break;
       case "q":
         break;
@@ -513,9 +513,58 @@ public void addPeople(){
   
 }//end of addPeople
 
+//checks if the person already exists
+//if the person already exists in the database, it returns true
+//if false, the person may be added to the database
 public boolean checkPerson(PeopleObj p){
-  return true;
+
+  boolean duh = true;
+  
+  // SQL statement to execute
+  String query = "select sin from People" +
+    " where UPPER(sin) ='" + p.getSinNo().toUpperCase() + "'";
+  
+      try{
+
+        ResultSet rs = Login.stmt.executeQuery(query);
+
+        //check if returned anything or not
+
+        duh = rs.next();
+
+
+      }catch(SQLException ex) {
+        System.err.println("SQLException: " +
+                           ex.getMessage());
+      }
+
+      if(duh)return true;
+      else return false;
+      
   
 }
+
+//commits the person to the database
+public void commitPerson(PeopleObj per){
+
+  System.out.println("Adding to database...");
+
+  //create SQL insert statement
+
+  String statement = per.createInsertStatement();
+  System.out.println(statement);
+
+  
+  try{
+    Login.stmt.executeUpdate(statement);
+    System.out.println("Person successfully added to the database!");
+  }catch(SQLException ex) {
+    System.err.println("SQLException: " +
+                       ex.getMessage());
+  }
+  
+}
+
+
   
 }

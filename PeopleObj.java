@@ -97,7 +97,38 @@ public void printAll(){
                      gender + " " + birthday);
 }
   
+//creates the insert statement, while minding null values
+  public String createInsertStatement(){
+    String statement = "insert into people values ('"+ sin + "'";
 
+    //don't be like me and write nulls as strings :D
+    if(name !=null)statement += ", '" + name + "'";
+    else statement += ", NULL";
+    
+    if(height !=null)statement += ", " + height + "";
+    else statement += ", NULL";
+    
+    if(weight !=null)statement += ", "  + weight;
+    else statement += ", NULL";
+    
+    if(eyecolor !=null)statement += ", '"  + eyecolor + "'";
+    else statement += ", NULL";
+    
+    if(haircolor !=null)statement += ", '" + haircolor + "'";
+    else statement += ", NULL";
 
+    if(address !=null)statement += ", '" + address + "'";
+    else statement += ", NULL";
+
+    if(gender !=null)statement += ", '" + gender + "'";
+    else statement += ",NULL";
+
+    if(birthday !=null)statement += ", TO_DATE('" + birthday + "', 'yyyy/mm/dd')";
+    else statement += ",NULL";
+    
+    statement += ")";
+    
+    return statement;
+  }
   
 }

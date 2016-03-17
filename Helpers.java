@@ -70,8 +70,8 @@ public void checkDate(String input, int length, String type) throws TooLongExcep
         //got here, know we have numbers - but are they valid numbers?
         //just letting people do whatever with the year, go wild
         if(parts[0].length() != 4) throw new DateFormatException();
-        if(parts[1].length() !=2 || Integer.parseInt(parts[1]) > 12) throw new DateFormatException();
-        if(parts[2].length() !=2 || Integer.parseInt(parts[2]) > 24) throw new DateFormatException();
+        if(parts[1].length() !=2 || Integer.parseInt(parts[1]) > 12 || Integer.parseInt(parts[1]) < 1) throw new DateFormatException();
+        if(parts[2].length() !=2 || Integer.parseInt(parts[2]) > 31 || Integer.parseInt(parts[2]) < 1) throw new DateFormatException();
         
       }else{
         throw new DateFormatException();
