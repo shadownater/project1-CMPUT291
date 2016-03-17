@@ -16,11 +16,13 @@ public class AutoTrans{
   Scanner scanner;
   Helpers h;
   TransactionObj trans;
-
+  mainMenu menu;
+                      
 public AutoTrans() {
   scanner = new Scanner(System.in);
   h = new Helpers();
   trans = new TransactionObj();
+  menu = new mainMenu();
 }
 
 public void autoTransMenu() {
@@ -60,10 +62,22 @@ public void addTransaction() {
 	// b) go to VehicleReg and come back once the vehicle is registered
   while(true) {
     System.out.print("(15 characters)              | Vehicle Id: ");
-    i = scanner.nextLine();
+    i = scanner.nextLine().trim();
     if(i.isEmpty()) i=null;
     try {
       h.checkValidity(i, 15, "String", false);
+      query = "Select serial_no from vehicle";
+      rs = Login.stmt.executeQuery(query);
+      String id = new String();
+      while(rs.next()) {
+        id = rs.getString("serial_no").trim();
+        if(id.equals(i) && i.equals(id)) {
+          break;
+        }
+      }
+      if(!id.equals(i)) {
+        throw new DNEException();
+      }
       break;
     } catch(CantBeNullException e) {
       System.out.println("Please enter a valid Vehicle Id: ");
@@ -71,23 +85,25 @@ public void addTransaction() {
       System.out.println("Please enter a shorter Vehicle Id: ");
     } catch(NumberFormatException e) {
       System.out.println("Please enter a valid Vehicle Id: ");
+    } catch (SQLException e) {
+      System.out.println("SQL Fail. Try again.");
+    } catch (DNEException e) {
+      System.out.println("Vehicle does not exist. Try again? Y/N: ");
+      // TODO: If one encounters this, returns to main menu, comes back and enters in a valid
+      // vehicle, it quits the program.
+      String input = scanner.nextLine();
+      if(input.equalsIgnoreCase("Y")) {
+        switch(input.toLowerCase()) {
+        case "y":
+          break;
+        }
+      } else {
+        System.out.println("Goodbye.");
+        menu.menu();
+      }
     }
-  }    
-    // TODO: Check if vehicle exists, give user mainMenu or try again option
-  /*try {
-    query = "SELECT serial_no FROM vehicle where serial_no == " + i;
-    rs = Login.stmt.executeQuery(query);
-    while(rs.next()) {
-      String id = rs.getString("serial_no");
-      //if (id == i) {
-      System.out.println(id);
-    }
-  } catch (SQLException ex) {
-    System.out.println("Vehicle does not exist. Register the vehicle fisrt.");
-    autoTransMenu();
-    //System.err.println("SQLException: " + ex.getMessage());
-    }*/
-  
+  }
+
   // Everything checks out, set the Vehicle Id
   trans.setVehicleId(i);
 
