@@ -131,7 +131,7 @@ public static void menu(){
 
     public static void main(String[] args){
         login();
-        System.out.println("Why you do did?");
+        
         try{
             // Initialize "global" scanner
             //Scanner scanner = IO.getScanner("test.txt");
