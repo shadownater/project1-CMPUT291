@@ -16,13 +16,13 @@ public class AutoTrans{
   Scanner scanner;
   Helpers h;
   TransactionObj trans;
-  mainMenu menu;
+//  mainMenu menu;
                       
 public AutoTrans() {
   scanner = new Scanner(System.in);
   h = new Helpers();
   trans = new TransactionObj();
-  menu = new mainMenu();
+//  menu = new mainMenu();
 }
 
 public void autoTransMenu() {
@@ -89,8 +89,6 @@ public void addTransaction() {
       System.out.println("SQL Fail. Try again.");
     } catch (DNEException e) {
       System.out.println("Vehicle does not exist. Try again? Y/N: ");
-      // TODO: If one encounters this, returns to main menu, comes back and enters in a valid
-      // vehicle, it quits the program.
       String input = scanner.nextLine();
       if(input.equalsIgnoreCase("Y")) {
         switch(input.toLowerCase()) {
@@ -98,8 +96,8 @@ public void addTransaction() {
           break;
         }
       } else {
-        System.out.println("Goodbye.");
-        menu.menu();
+        System.out.println("See you again soon.");
+        return;
       }
     }
   }
