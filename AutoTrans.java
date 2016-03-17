@@ -117,6 +117,7 @@ public void addTransaction() {
     if(i.isEmpty()) i=null;
     // TODO: Check if seller is owner
     try {
+      // Make sure input is valid
       h.checkValidity(i, 15, "String", false);
       // Make sure person exists
       query = "Select sin from people";
@@ -126,28 +127,15 @@ public void addTransaction() {
         id = rs.getString("sin").trim();
 	// If a match is found, set seller ID and break out of loop
         if(id.equals(i)) {
-	  query = "Select owner_id from owner";
-	  rs = Login.stmt.executeQuery(query);
-	  String own = new String();
-	    while(rs.next()) {
-	      own = rs.getString("owner_id").trim();
-	      if(own.equals(i)) {
-		break;
-	      }
-	  if(!own.equals(i)) {
-	    throw new NotOwnerException();
-	  } else {
-	    trans.setSellerId(i);
-	  }
-	  break;
-        }
-	if(!id.equals(i)) {
-          throw new DNEException();
+          trans.setSellerId(i);
+          break;
         }
       }
-      // If the id is not i, then return that it does not exist
-      
+      if(!id.equals(i)) {
+        throw new DNEException();
+      }
       break;
+      // if the id is not i, then return that it does not exist
     } catch(CantBeNullException e) {
       System.out.println("Please enter a valid Vehicle Id: ");
     } catch(TooLongException e) {
@@ -170,7 +158,7 @@ public void addTransaction() {
 	  break;
         }
       } else {
-        System.out.println("See you soon.");
+        System.out.println("Goodbye!");
         return;
       }
     }
