@@ -135,4 +135,32 @@ public class DriverObj{
                            "|  DOB: " + birthday + "\n" +
                            "+-----------------------------------------------------+");                           
     }
+
+  public String createInsertStatement(){
+    String statement = "insert into drive_licence values ('"+ licenceNo + "'";
+
+    //don't be like me and write nulls as strings :D
+    if(sin !=null)statement += ", '" + sin + "'";
+    else statement += ", NULL";
+
+    if(drivingClass !=null)statement += ", '" + drivingClass + "'";
+    else statement += ", NULL";
+
+    //NOT LIKE THIS
+    if(photo !=null)statement += ", ?";
+    else statement += ", NULL";
+
+    if(issueDate!=null)statement += ", TO_DATE('"  + issueDate + "', 'yyyy/mm/dd')";
+    else statement += ", NULL";
+
+    if(expiryDate !=null)statement += ", TO_DATE('" + expiryDate + "', 'yyyy/mm/dd')";
+    else statement += ", NULL";
+
+    statement += ")";
+
+    return statement;
+    
+  }
+
+  
 }

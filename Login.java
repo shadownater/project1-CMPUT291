@@ -10,7 +10,8 @@ public class Login{
   public static String m_userName;
   public static String m_password;
   static Statement stmt;
-
+  static PreparedStatement pstmt;
+  
   // The URL we are connecting to
   public static String m_url = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
   

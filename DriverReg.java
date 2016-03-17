@@ -83,14 +83,15 @@ public void addLicence(){
     }
 
     dL.setLicenceNo(i);
-
+    String found = null;
+    
     while(true){
       System.out.print("Sin(15): ");
       i = scanner.nextLine();
       if(i.isEmpty()) i=null;
       try{
         h.checkValidity(i, 15, STRING_TYPE, true);
-        h.checkFK(i, "people", "sin", false, true);
+        found = h.checkFK(i, "people", "sin", false, true);
         break;
       }catch(CantBeNullException e){
         System.out.println("Entry cannot be null!");
@@ -117,7 +118,8 @@ public void addLicence(){
       }
     }
 
-    dL.setSin(i);
+    if(found==null) dL.setSin(i);
+    else dL.setSin(found);
     
     while(true){
       System.out.print("Class(10): ");
@@ -226,7 +228,7 @@ public void confirmEntries(DriverObj drive){
       //**upload data to database here!
       
       if(!checkDriver(drive)){
-        //commitDriver(drive); **write after
+        commitDriver(drive); 
       }
          else System.out.println("Driver's licence already exists in the database. Please try again."); 
       break;  
@@ -273,22 +275,42 @@ public void confirmEntries(PeopleObj peep){
   
   
   //checks if the primary and unique keys are already in the database for the driver's licence
+//true = the iput is already in the database  
+//false = the input is not already in the databasse
 public boolean checkDriver(DriverObj d){
   //need to check primary key and unique key together
   //it's NOT ok if there are multiple sins (but can be null)
   //it's NOT ok if there are multiple licence_no's 
 
   boolean duh = true;
-  String query;
+  String query1, query2;
+
+  query1 = "select licence_no from Drive_licence" +
+    " where UPPER(licence_no)='" + d.getLicenceNo().toUpperCase() + "'";
+
+  try{
+
+    ResultSet rs = Login.stmt.executeQuery(query1);
+
+    //check if returned anything or not
+
+    duh = rs.next();
+
+
+  }catch(SQLException ex) {
+    System.err.println("SQLException: " +
+                       ex.getMessage());
+  }
+  
+  if(duh) return true;
   
   if(d.getSin() !=null){
     
-    query = "select licence_no, sin from Drive_licence" +
-      " where UPPER(licence_no) ='" + d.getLicenceNo().toUpperCase() +
-      "' and UPPER(sin)='" + d.getSin().toUpperCase() + "'";
+    query2 = "select sin from Drive_licence" +
+      " where UPPER(sin)='" + d.getSin().toUpperCase() + "'";
   }else{
     //get in here if sin is listed as null
-    query = "select licence_no, sin from Drive_licence" +
+    query2 = "select licence_no, sin from Drive_licence" +
       " where UPPER(licence_no) ='" + d.getLicenceNo().toUpperCase() +
       "' and sin is null";
   }
@@ -296,7 +318,7 @@ public boolean checkDriver(DriverObj d){
   
   try{
     
-    ResultSet rs = Login.stmt.executeQuery(query);
+    ResultSet rs = Login.stmt.executeQuery(query2);
     
     //check if returned anything or not
     
@@ -565,6 +587,45 @@ public void commitPerson(PeopleObj per){
   
 }
 
+public void commitDriver(DriverObj dl){
 
+  System.out.println("Adding to database...");
+
+  //create SQL insert statement - this statement uses PREPAREDSTATEMENT for the photo part
+  //statement is always set up correctly, just need to pick the
+  //right pstmt or stmt to enact it (when photo or not)
+  String statement = dl.createInsertStatement();
+
+  if(dl.getPhoto()!=null){
+  try{
+    
+  Login.pstmt = Login.stmt.getConnection().prepareStatement(statement);
+
+  Login.pstmt.clearParameters();
+
+  Login.pstmt.setBinaryStream(1, new FileInputStream(dl.getPhoto()), (int)dl.getPhoto().length() );
+
+  
+    Login.pstmt.executeUpdate();
+    System.out.println("Licence successfully added to the database!");
+  }catch(SQLException ex) {
+    System.err.println("SQLException: " +
+                       ex.getMessage());
+  }catch(FileNotFoundException eep){
+    System.err.println("Photo not found. Photo input: " +dl.getPhoto());
+  }
+  }else{
+
+    try{
+      Login.stmt.executeUpdate(statement);
+      System.out.println("Person successfully added to the database!");
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+    
+  }
+  
+}
   
 }
