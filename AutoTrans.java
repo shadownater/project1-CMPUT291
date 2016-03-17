@@ -16,12 +16,13 @@ public class AutoTrans{
   Scanner scanner;
   Helpers h;
   TransactionObj trans;
-
-
+//  mainMenu menu;
+                      
 public AutoTrans() {
   scanner = new Scanner(System.in);
   h = new Helpers();
   trans = new TransactionObj();
+//  menu = new mainMenu();
 }
 
 public void autoTransMenu() {
@@ -49,6 +50,9 @@ public void addTransaction() {
   // Initialize use variables
   float n;
   String i;
+  String s;
+  String query;
+  ResultSet rs;
   // Begin asking user for input:
   System.out.print("Please fill out the following details in the alotted amount of space:\n");
 
@@ -58,11 +62,22 @@ public void addTransaction() {
 	// b) go to VehicleReg and come back once the vehicle is registered
   while(true) {
     System.out.print("(15 characters)              | Vehicle Id: ");
-    i = scanner.nextLine();
+    i = scanner.nextLine().trim();
     if(i.isEmpty()) i=null;
-    // TODO: Check if vehicle exists, give user mainMenu or try again options
     try {
       h.checkValidity(i, 15, "String", false);
+      query = "Select serial_no from vehicle";
+      rs = Login.stmt.executeQuery(query);
+      String id = new String();
+      while(rs.next()) {
+        id = rs.getString("serial_no").trim();
+        if(id.equals(i) && i.equals(id)) {
+          break;
+        }
+      }
+      if(!id.equals(i)) {
+        throw new DNEException();
+      }
       break;
     } catch(CantBeNullException e) {
       System.out.println("Please enter a valid Vehicle Id: ");
@@ -70,8 +85,23 @@ public void addTransaction() {
       System.out.println("Please enter a shorter Vehicle Id: ");
     } catch(NumberFormatException e) {
       System.out.println("Please enter a valid Vehicle Id: ");
+    } catch (SQLException e) {
+      System.out.println("SQL Fail. Try again.");
+    } catch (DNEException e) {
+      System.out.println("Vehicle does not exist. Try again? Y/N: ");
+      String input = scanner.nextLine();
+      if(input.equalsIgnoreCase("Y")) {
+        switch(input.toLowerCase()) {
+        case "y":
+          break;
+        }
+      } else {
+        System.out.println("See you again soon.");
+        return;
+      }
     }
   }
+
   // Everything checks out, set the Vehicle Id
   trans.setVehicleId(i);
 

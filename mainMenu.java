@@ -16,11 +16,11 @@ public static void login(){
   System.out.print("Username: ");
   Console co = System.console();
   Login.m_userName = co.readLine();
-  
+
   // obtain password
   char[] passwordArray = co.readPassword("Password: ");
   Login.m_password =new String(passwordArray);
-  
+
 
   try{
     Class drvClass = Class.forName(Login.m_driverName);    
@@ -32,19 +32,15 @@ public static void login(){
   try{
     // Establish a connection
     m_con = DriverManager.getConnection(Login.m_url, Login.m_userName, Login.m_password);
-    
     // Create a statement object.
     // Changed to reflect changes made in the result set and to make these changes permanent to the database too
     Login.stmt = m_con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-
   
-}catch(SQLException ex) {
-      System.err.println("SQLException: " +
+  }catch(SQLException ex) {
+    System.err.println("SQLException: " +
                          ex.getMessage());
     login();
     }
-
-
 }
 
 
@@ -133,16 +129,17 @@ public static void menu(){
 
 }
 
-    public static void main(String args[]){
+    public static void main(String[] args){
         login();
+        
         try{
             // Initialize "global" scanner
-            Scanner scanner = IO.getScanner("test.txt");
+            //Scanner scanner = IO.getScanner("test.txt");
             menu();
         }catch(NoSuchElementException e){
-            System.out.println("End of tests, returning to stdin.");
+          //System.out.println("End of tests, returning to stdin.");
 
-            Scanner scanner = IO.resetScanner();
+          //Scanner scanner = IO.resetScanner();
             menu();
         }
             
@@ -150,4 +147,5 @@ public static void menu(){
   
  
     }//end of main
+
 }
