@@ -167,6 +167,7 @@ public class DriverSearch{
 
     // parseDriverSearch: takes a resultSet rs and stores the info in
     //                    >=1 DriverObj instance(s)
+    //                    which are then stored in a map
     //             input: ResultSet rs
     //           returns: Map containing >= 1 DriverObj instance(s)
     public Map<String,DriverObj> parseDriverSearch(ResultSet rs){

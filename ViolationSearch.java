@@ -14,7 +14,7 @@ public class ViolationSearch{
     final String STRING_TYPE = "String";
     
     // violationSearchMenu: provides user navigation, prompts user input,
-    //                      validates input, calls driverSearch
+    //                      validates input, calls violationSearch
     //               input: none
     //             returns: true
     //                        -if a successful search completed
@@ -37,7 +37,8 @@ public class ViolationSearch{
             // loop to prompt/get user input
             while(true){
                 if(input.equals("1")){
-                    String sin = ""; 
+                    // in case 1, sin is not used, set to empty string
+                    String sin = "";
                     String i = "";
                 
                     // Check validity of user search criteria, l is valid length
@@ -70,6 +71,7 @@ public class ViolationSearch{
                     break;
                     
                 }else if(input.equals("2")){
+                    // in case 2, licence_no is not used, set to empty string
                     String licence_no = ""; 
                     String i = "";
                 
@@ -120,7 +122,7 @@ public class ViolationSearch{
 
     // violationSearch: generates and executes query, calls parseViolationSearch
     //                  then call printViolationSearch
-    //           input: Strings name, licenceNo. There are strings to used to
+    //           input: Strings name, licenceNo. These are strings to used to
     //                  generate the queries' WHERE clause; only one of these
     //                  should be passed per call.
     //         returns: true
@@ -175,8 +177,9 @@ public class ViolationSearch{
 
     }
 
-    // parseDriverSearch: takes a resultSet rs and stores the info in
-    //                    >=1 ViolationObj instance(s)
+    // parseDriverSearch: takes a ResultSet rs and stores the info in
+    //                    >=1 ViolationObj instance(s),
+    //                    which are then stored in a map
     //             input: ResultSet rs
     //           returns: Map containing ViolationObj instance(s)
     public Map<String,ViolationObj> parseViolationSearch(ResultSet rs){
@@ -212,8 +215,8 @@ public class ViolationSearch{
                 s = rs.getString("vtype");
                 d.setVtype(s);
 
-                s = rs.getString("vdate");
-                d.setVtype(s);                    
+                date = rs.getDate("vdate");
+                d.setVDate(date);                    
                     
                 s = rs.getString("place");
                 d.setPlace(s);
@@ -227,7 +230,7 @@ public class ViolationSearch{
                                e.getMessage());                
         }        
 
-        // Return to map to callee
+        // Return map to callee
         return m;
     }
 
@@ -238,7 +241,7 @@ public class ViolationSearch{
         ViolationObj d;
         for(String k: m.keySet()){
             d = m.get(k);
-            d.printAll();            
+            d.printRecord();            
         }
         System.out.println();
     }    
