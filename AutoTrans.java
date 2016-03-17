@@ -65,16 +65,21 @@ public void addTransaction() {
     i = scanner.nextLine().trim();
     if(i.isEmpty()) i=null;
     try {
+      // Make sure input is valid input
       h.checkValidity(i, 15, "String", false);
+      // Make sure vehicle exists
       query = "Select serial_no from vehicle";
       rs = Login.stmt.executeQuery(query);
       String id = new String();
       while(rs.next()) {
         id = rs.getString("serial_no").trim();
-        if(id.equals(i) && i.equals(id)) {
-          break;
+	// If a match is found, set vehicle ID and break out of loop
+        if(id.equals(i)) {
+          trans.setVehicleId(i);
+	  break;
         }
       }
+      // If the id is not i, then return that it does not exist
       if(!id.equals(i)) {
         throw new DNEException();
       }
@@ -88,22 +93,21 @@ public void addTransaction() {
     } catch (SQLException e) {
       System.out.println("SQL Fail. Try again.");
     } catch (DNEException e) {
-      System.out.println("Vehicle does not exist. Try again? Y/N: ");
+      System.out.println("Vehicle does not exist. Try again(T) or return to Main Menu(other)?: ");
+      // If the vehicle does not exist, then either try again
+      // Or go back to main menu by not typing y/Y.
       String input = scanner.nextLine();
-      if(input.equalsIgnoreCase("Y")) {
+      if(input.equalsIgnoreCase("T")) {
         switch(input.toLowerCase()) {
-        case "y":
+        case "t":
           break;
         }
       } else {
-        System.out.println("See you again soon.");
+        System.out.println("See you soon.");
         return;
       }
     }
   }
-
-  // Everything checks out, set the Vehicle Id
-  trans.setVehicleId(i);
 
   // Ask user for buyer and seller id
   // If buyer and/or user does not exist, go create one and come back
@@ -111,9 +115,38 @@ public void addTransaction() {
     System.out.print("(15 characters)              | Seller Id: ");
     i = scanner.nextLine();
     if(i.isEmpty()) i=null;
-    // TODO: Check if person exists, offer to make a person or try again
+    // TODO: Check if seller is owner
     try {
       h.checkValidity(i, 15, "String", false);
+      // Make sure person exists
+      query = "Select sin from people";
+      rs = Login.stmt.executeQuery(query);
+      String id = new String();
+      while(rs.next()) {
+        id = rs.getString("sin").trim();
+	// If a match is found, set seller ID and break out of loop
+        if(id.equals(i)) {
+	  query = "Select owner_id from owner";
+	  rs = Login.stmt.executeQuery(query);
+	  String own = new String();
+	    while(rs.next()) {
+	      own = rs.getString("owner_id").trim();
+	      if(own.equals(i)) {
+		break;
+	      }
+	  if(!own.equals(i)) {
+	    throw new NotOwnerException();
+	  } else {
+	    trans.setSellerId(i);
+	  }
+	  break;
+        }
+	if(!id.equals(i)) {
+          throw new DNEException();
+        }
+      }
+      // If the id is not i, then return that it does not exist
+      
       break;
     } catch(CantBeNullException e) {
       System.out.println("Please enter a valid Vehicle Id: ");
@@ -121,10 +154,29 @@ public void addTransaction() {
       System.out.println("Please enter a shorter Vehicle Id: ");
     } catch(NumberFormatException e) {
       System.out.println("Please enter a valid Vehicle Id: ");
+    } catch(SQLException e) {
+      System.out.println("SQL Fail. Try again.");
+    } catch(DNEException e) {
+      System.out.println("Person does not exist. Try again(T), Register a person(R) or return to main Menu(other)?: ");
+      // If the seller does not exist, then either try again
+      // Or register a new person or Quit to mainMenu.
+      String input = scanner.nextLine();
+      if(input.equalsIgnoreCase("T") || input.equalsIgnoreCase("R")) {
+        switch(input.toLowerCase()) {
+        case "t":
+          break;
+	case "r":
+	  // register person
+	  break;
+        }
+      } else {
+        System.out.println("See you soon.");
+        return;
+      }
     }
   }
 
-  trans.setSellerId(i);
+  //trans.setSellerId(i);
 
   while(true) {
     System.out.print("(15 characters)              | Buyer Id: ");
