@@ -358,7 +358,6 @@ public void finTrans(TransactionObj trans) {
     ", '" + trans.getVehicleId() + "'" +
     ", TO_DATE('" + trans.getSDate() + "', 'yyyy/mm/dd')" +
     ", " + trans.getPrice() + ")";
-  System.out.println(createString);
 
   String query = "select owner_id" +
     " from owner" +

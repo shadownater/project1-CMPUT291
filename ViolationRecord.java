@@ -53,7 +53,7 @@ public class ViolationRecord {
     // Ask user for ticket#
     // If ticket# exists, try again or exit to main menu
     while(true) {
-      System.out.print("(Integer) Ticket#: ");
+      System.out.print("(Integer)         | Ticket#: ");
       i = scanner.nextLine();
       if(i.isEmpty()) i=null;
       try {
@@ -101,7 +101,7 @@ public class ViolationRecord {
     // Ask user for OfficerId:
     // If person DNE, try again or create person
     while(true) {
-      System.out.print("(15 characters) Officer Id: ");
+      System.out.print("(15 characters)   | Officer Id: ");
       i = scanner.nextLine();
       if(i.isEmpty()) i=null;
       // TODO: Check if person exists or not
@@ -152,63 +152,139 @@ public class ViolationRecord {
       }
     }
 
-    // Ask User for ViolatorId:
+    // Ask User for VehicleId:
     while(true) {
-      System.out.print("(15 characters) Violator Id: ");
-      i = scanner.nextLine();
+      System.out.print("(15 characters)   | Vehicle Id: ");
+      i = scanner.nextLine().trim();
       if(i.isEmpty()) i=null;
-      // TODO: check if person exists
-      // if DNE, try again or create person
       try {
-        // Check that input is valid
+        // Make sure input is valid input
         h.checkValidity(i, 15, "String", false);
-        // Make sure person exists
-        query = "Select sin from people";
+        // Make sure vehicle exists
+        query = "Select serial_no from vehicle";
         rs = Login.stmt.executeQuery(query);
         String id = new String();
         while(rs.next()) {
-          id = rs.getString("sin").trim().toLowerCase();
-          // If a match is found, set buyer id and break out of loopo
+          id = rs.getString("serial_no").trim().toLowerCase();
+          // If a match is found, set vehicle ID and break out of loop
           if(id.equals(i.toLowerCase())) {
-            vio.setViolatorNo(id);
+            vio.setVehicleID(id);
             break;
           }
         }
+        // If the id is not i, then return that it does not exist
         if(!id.equals(i.toLowerCase())) {
           throw new DNEException();
         }
         break;
       } catch(CantBeNullException e) {
-        System.out.println("Please enter a valid Violator Id: ");
+        System.out.println("Please enter a valid Vehicle Id: ");
       } catch(TooLongException e) {
-        System.out.println("Please enter a shorter Violator Id: ");
+        System.out.println("Please enter a shorter Vehicle Id: ");
       } catch(NumberFormatException e) {
-        System.out.println("Please enter a string Violator Id: ");
-      } catch(SQLException e) {
+        System.out.println("Please enter a string Vehicle Id: ");
+      } catch (SQLException e) {
         System.out.println("SQL Fail. Try again.");
-      } catch(DNEException e) {
-        System.out.println("Person does not exist. Try again(T), Register a person(R), or return to Main Menu(other)?");
-        // If the buyer does not exist, then either try again
-        // or register a new person or quite to mainMenu.
+      } catch (DNEException e) {
+        System.out.println("Vehicle does not exist. Try again(T) or \nreturn to Main Menu to complete an Auto Registration(other)?: ");
+        // If the vehicle does not exist, then either try again
+        // Or go back to main menu.
         String input = scanner.nextLine();
-        if(input.equalsIgnoreCase("T") || input.equalsIgnoreCase("R")) {
+        if(input.equalsIgnoreCase("T")) {
           switch(input.toLowerCase()) {
           case "t":
             break;
-          case "r":
-            noob.addPeople();
-            break;
           }
         } else {
-          System.out.println("Goodbye!");
+          System.out.println("See you soon.");
           return;
         }
       }
     }
 
+    boolean flag = true;
+    // Ask User for ViolatorId:
+    while(flag) {
+      System.out.println("Would you like to issue the ticket to the driver(D) or primary owner(O) of the vehicle?");
+      String select = scanner.nextLine();
+      if(select.equalsIgnoreCase("D") || select.equalsIgnoreCase("O")) {
+        switch(select.toLowerCase()) {
+        case "d":
+          System.out.print("(15 characters)   | Violator Id: ");
+          i = scanner.nextLine();
+          if(i.isEmpty()) i=null;
+          // check if person exists. If DNE, try again or create person
+          try {
+            // Check that input is valid
+            h.checkValidity(i, 15, "String", false);
+            // Make sure person exists
+            query = "Select sin from people";
+            rs = Login.stmt.executeQuery(query);
+            String id = new String();
+            while(rs.next()) {
+              id = rs.getString("sin").trim().toLowerCase();
+              // If a match is found, set buyer id and break out of loop
+              if(id.equals(i.toLowerCase())) {
+                vio.setViolatorNo(id);
+                flag = false;
+                break;
+              }
+            }
+            if(!id.equals(i.toLowerCase())) {
+              throw new DNEException();
+            }
+            break;
+          } catch(CantBeNullException e) {
+            System.out.println("Please enter a valid Violator Id: ");
+          } catch(TooLongException e) {
+            System.out.println("Please enter a shorter Violator Id: ");
+          } catch(NumberFormatException e) {
+            System.out.println("Please enter a string Violator Id: ");
+          } catch(SQLException e) {
+            System.out.println("SQL Fail. Try again.");
+          } catch(DNEException e) {
+            System.out.println("Person does not exist. Try again(T), Register a person(R), or return to Main Menu(other)?");
+            // If the buyer does not exist, then either try again
+            // or register a new person or quite to mainMenu.
+            String again = scanner.nextLine();
+            if(again.equalsIgnoreCase("T") || again.equalsIgnoreCase("R")) {
+              switch(again.toLowerCase()) {
+              case "t":
+                break;
+              case "r":
+                noob.addPeople();
+                break;
+              }
+            } else {
+              System.out.println("Goodbye!");
+              return;
+            }
+          }
+          break;
+        case "o":
+          query = "select owner_id from owner where is_primary_owner = 'y'\n" +
+            "and LOWER(vehicle_id) = '" + vio.getVehicleID().toLowerCase() + "'";
+          try {
+            rs = Login.stmt.executeQuery(query);
+            while(rs.next()) {
+              String s = rs.getString("owner_id");
+              vio.setViolatorNo(s);
+              flag = false;
+            }
+            System.out.println("primary owner blamed\n");
+          } catch(SQLException e) {
+            System.err.println("SQL Fail: " + e.getMessage());
+          }
+        }
+      } else {
+        System.out.println("Goodbye!");
+        return;
+      }
+    }
+    
     // Ask user for VType:
     while(true) {
-      System.out.print("(10 Characters) Violation Type: ");
+      System.out.print("(10 Characters)   | Violation Type: ");
       i = scanner.nextLine().replaceAll("\\s+","");
       if(i.isEmpty()) i=null;
       // TODO: make sure it is a valid VType.
@@ -257,7 +333,7 @@ public class ViolationRecord {
 
     // Ask user for Location:
     while(true) {
-      System.out.print("(20 Characters) Location: ");
+      System.out.print("(20 Characters)   | Location: ");
       i = scanner.nextLine();
       if(i.isEmpty()) i=null;
       try {
@@ -276,7 +352,7 @@ public class ViolationRecord {
 
     // Ask user for Comments:
     while(true) {
-      System.out.print("(1024 Characters) Comments: ");
+      System.out.print("(1024 Characters) | Comments: ");
       i = scanner.nextLine();
       if(i.isEmpty()) i=null;
       try {
@@ -320,7 +396,25 @@ public class ViolationRecord {
 
 
 public void finRecord(ViolationObj vio) {
-  System.out.println("Record Complete!");
+  System.out.println("adding...");
+
+  //Create SQL insert statement to record ViolationRecord
+  String createString = "insert into ticket values (" + vio.getTicketNo() +
+    ", '" + vio.getViolatorNo() + "'" +
+    ", '" + vio.getVehicleID() + "'" +
+    ", '" + vio.getOfficeNo() + "'" +
+    ", '" + vio.getVtype() + "'" +
+    ", TO_DATE('" + vio.getVDate() + "', 'yyyy/mm/dd')" +
+    ", '" + vio.getPlace() + "'" +
+    ", '" + vio.getDescriptions() + "')";
+
+  try {
+    // Create a ticket
+    Login.stmt.executeUpdate(createString);
+    System.out.println("Record Complete!");
+  } catch(SQLException e) {
+    System.err.println("SQL Fail: " + e.getMessage());
+  }
 }
 }
 
