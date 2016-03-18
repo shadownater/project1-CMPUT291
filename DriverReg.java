@@ -60,7 +60,8 @@ public void driverRegMenu(){
     driverRegMenu();
   }
 }
-
+  
+//Displays the information for adding a licence and allows the user to input info.
 public void addLicence(){
 
   //some new things in here: blob, varchar, date, and unique constraint!
@@ -594,7 +595,8 @@ public void commitPerson(PeopleObj per){
   }
   
 }
-
+  
+//commits the driver to the database
 public void commitDriver(DriverObj dl){
 
   System.out.println("Adding to database...");
@@ -636,6 +638,7 @@ public void commitDriver(DriverObj dl){
   
 }
 
+//a menu asking the user if they would like to add driving conditions
   public void drivingConditionsMenu(){
     System.out.println("Would you like to add driving conditions? Y/N");
 
@@ -659,6 +662,7 @@ public void commitDriver(DriverObj dl){
     
   }//end of drivingConditionsMenu
 
+//part of the program where the user can add driving conditions
   public void addDrivingConditions(){
 
     System.out.println("Please provide the licence number: ");
@@ -743,6 +747,7 @@ public void commitDriver(DriverObj dl){
     
   }// end of add DrivingConditions
 
+//displays the possible driving conditions.
   public void displayConditions(){
 
     String query = "select c_id, description from driving_condition";
@@ -776,7 +781,7 @@ public void commitDriver(DriverObj dl){
 
         
   }
-
+//displays the instructions for adding a dricing condition/restriction.
   public void displayInstructions(){
     System.out.println("Type the number and hit enter to add the condition.\n" +
                        "Please only add the condition once.\n" +

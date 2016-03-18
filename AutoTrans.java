@@ -25,6 +25,7 @@ public AutoTrans() {
   noob = new DriverReg();
 }
 
+//displays the auto trans menu
 public void autoTransMenu() {
   // Confirm this is where you want to be
   System.out.print("Would you like to register a transaction? Y/N : ");
@@ -47,6 +48,7 @@ public void autoTransMenu() {
   }
 }
 
+//Allows the user to enter info for the transaction
 public void addTransaction() {
 
   // Initialize use variables
