@@ -121,9 +121,25 @@ public class VehicleSearch{
                 printVehicleResults(m);
                 return true;
             }else{
-                System.out.println("Sorry, no matches found.");
-                System.out.println();
-                return false;
+                // Check if this vehicle hasn't been bought/sold,
+                // but has been registered. Simply print the new object
+                // with null values. No need to parse or use maps.
+                query = "SELECT serial_no FROM vehicle WHERE serial_no = \'";
+                query += vin.toLowerCase() + "\'";
+                rs = Login.stmt.executeQuery(query);
+                if (rs.isBeforeFirst()) {
+                    rs.next();
+                    VehicleHistoryObj d = new VehicleHistoryObj();
+                    String s = rs.getString("serial_no");
+                    d.setVin(s);
+                    d.printRecord();
+                    System.out.println();
+                    return true;
+                }else{
+                    System.out.println("Sorry, no matches found.");
+                    System.out.println();
+                    return false;
+                }
             }
         }catch(SQLException ex){
             System.err.println("SQLException: " +
