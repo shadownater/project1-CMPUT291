@@ -83,10 +83,6 @@ public class ViolationObj{
                            "\nComments: " + descriptions);
     }
 
-    public void finRecord() {
-	System.out.println("Record Complete!");
-    }
-
     public void printRecord(){
         System.out.println("+-----------------------------------------------------+\n" +
                            "|  Ticket No. " + ticketNo + "\n" +

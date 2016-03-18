@@ -3,18 +3,22 @@ import java.sql.*;
 import java.io.*;
 
 // Violation Record
-//
+// This is used by police officers to issue traffic tickets
+// and record the violation. An officer may choose to issue
+// the ticket to the primary owner of the vehicle involved
+// or to the driver of the vehicle.
 
-//
 public class ViolationRecord {
   Scanner scanner;
   Helpers h;
   ViolationObj vio;
+  DriverReg noob;
 
   public ViolationRecord() {
     scanner = new Scanner(System.in);
     h = new Helpers();
     vio = new ViolationObj();
+    noob = new DriverReg();
   }
 
   public void violationRecordMenu() {
@@ -38,7 +42,10 @@ public class ViolationRecord {
   public void addRecord() {
     // Initialize temporary variables:
     String i;
-    //Integer n;
+    float n;
+    int m;
+    String query;
+    ResultSet rs;
 
     // Begin asking user for input:
     System.out.print("Please fill out the following details within the constrictions: \n");
@@ -87,13 +94,33 @@ public class ViolationRecord {
     vio.setViolatorNo(i);
 
     // Ask user for VehicleId:
+    // If vehicle does not exist, then tell user to:
+    // a) try again
+    // b) go to VehicleReg from Main Menu and come back later
     while(true) {
       System.out.print("(15 Characters) Vehicle Id: ");
-      i = scanner.nextLine();
+      i = scanner.nextLine().trim();
       if(i.isEmpty()) i=null;
       // TODO: make sure vehicle exists. If not, try again or go to main menu
       try {
+        // Make sure input is valid input
         h.checkValidity(i, 15, "String", false);
+        // Make sure vehicle exists
+        query = "Select serial_no from vehicle";
+        rs = Login.stmt.executeQuery(query);
+        String id = new String();
+        while(rs.next()) {
+          id = rs.getString("serial_no").trim().toLowerCase();
+          // If a match is found, set vehicle Id and break out of loop
+          if(id.equals(i.toLowerCase())) {
+            vio.setVehicleID(id);
+            break;
+          }
+        }
+        // If the id is not i, then return that it does not exist
+        if(!id.equals(i.toLowerCase())) {
+          throw new DNEException();
+        }
         break;
       } catch(CantBeNullException e) {
         System.out.println("Please enter a valid Vehicle Id: ");
@@ -101,10 +128,23 @@ public class ViolationRecord {
         System.out.println("Please enter a shorter Vehicle Id: ");
       } catch(NumberFormatException e) {
         System.out.println("Please enter a string Vehicle Id: ");
+      } catch(SQLException e) {
+        System.out.println("SQL Fail. Try again.");
+      } catch(DNEException e) {
+        System.out.println("Vehicle does not exist. Try again(T) or return to Main Menu(other)?: ");
+      // If the vehicle does not exist, then either try again
+      // Or go back to main menu.
+      String input = scanner.nextLine();
+      if(input.equalsIgnoreCase("T")) {
+        switch(input.toLowerCase()) {
+        case "t":
+          break;
+        }
+      } else {
+        System.out.println("See you soon.");
+        return;
       }
     }
-    // Everything checks out, set the VehicleId:
-    vio.setVehicleID(i);
 
     // Ask user for VType:
     while(true) {
@@ -178,7 +218,7 @@ public class ViolationRecord {
     if(input.equalsIgnoreCase("Y") || input.equalsIgnoreCase("N")) {
     switch(input.toLowerCase()){
       case "y":
-        vio.finRecord();
+        finRecord(vio);
         break;
       case "n":
         violationRecordMenu();
@@ -188,7 +228,13 @@ public class ViolationRecord {
       System.out.println("Invalid Input!");
     }
 
-  // TODO: Update database with ingormation given.
-  // Tables required: ticket
+    // TODO: Update database with ingormation given.
+    // Tables required: ticket
+  }
 }
+
+public void finRecord(ViolationObj vio) {
+  System.out.println("Record Complete!");
+}
+
 }

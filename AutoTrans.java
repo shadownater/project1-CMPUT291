@@ -54,6 +54,7 @@ public void addTransaction() {
   String s;
   String query;
   ResultSet rs;
+  
   // Begin asking user for input:
   System.out.print("Please fill out the following details in the alotted amount of space:\n");
 
@@ -96,7 +97,7 @@ public void addTransaction() {
     } catch (DNEException e) {
       System.out.println("Vehicle does not exist. Try again(T) or return to Main Menu(other)?: ");
       // If the vehicle does not exist, then either try again
-      // Or go back to main menu by not typing y/Y.
+      // Or go back to main menu.
       String input = scanner.nextLine();
       if(input.equalsIgnoreCase("T")) {
         switch(input.toLowerCase()) {
