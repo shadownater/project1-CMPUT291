@@ -64,8 +64,4 @@ public class TransactionObj {
     public Float getPrice () {
  	return price;
     }
-
-    public void finTrans () {
-	System.out.print("Transaction Complete!\n");
-    }
 }
