@@ -212,8 +212,26 @@ public void addTransaction() {
         id = rs.getString("sin").trim().toLowerCase();
         // If a match is found, set buyer id and break out of loopo
         if(id.equals(i.toLowerCase())) {
-          trans.setBuyerId(id);
-          break;
+            /**
+               BEGIN KG EDIT
+               ORIGINAL--->
+               trans.setBuyerId(id);
+               break;
+               <---
+            **/
+            // Buyer cannot be the seller
+            String j = trans.getSellerId();
+            if(!i.toLowerCase().equals(j.toLowerCase())){
+                trans.setBuyerId(id);
+                break;
+            }else{
+                throw new BuyerIsSellerException();
+            }                     
+            /**
+               END KG EDIT
+
+               Note: 
+            **/
         }
       }
       if(!id.equals(i.toLowerCase())) {
@@ -246,7 +264,26 @@ public void addTransaction() {
         System.out.println("Goodbye!");
         return;
       }
+      /**
+         BEGIN KG EDIT
+         ORIGINA---><---
+      **/
+    } catch(BuyerIsSellerException e) {
+        System.out.println("Buyer cannot be seller. Try again(T) or return to Main Menu(other)?");
+        String input = scanner.nextLine();
+        if(input.equalsIgnoreCase("T")) {
+            switch(input.toLowerCase()) {
+            case "t":
+                break;
+            }
+        } else {
+            System.out.println("Goodbye!");
+            return;
+        }        
     }
+    /** 
+        END KG EDIT
+    **/    
   }
   while(true) {
     System.out.print("(Integer)                    | Transaction #: ");

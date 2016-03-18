@@ -5,7 +5,7 @@ import java.io.*;
 public class VehicleHistoryObj{
     String vin;
     String sales;
-    String avgSalePrice;
+    float avgSalePrice;
     String violations;
 
     public void setVin(String input){
@@ -16,7 +16,7 @@ public class VehicleHistoryObj{
         sales = input;
     }
     
-    public void setAvgSalePrice(String input){
+    public void setAvgSalePrice(float input){
         avgSalePrice = input;
     }
     
@@ -33,7 +33,7 @@ public class VehicleHistoryObj{
         return sales;
     }
 
-    public String getAvgSalePrice(){
+    public float getAvgSalePrice(){
         return avgSalePrice;
     }
 
@@ -44,5 +44,14 @@ public class VehicleHistoryObj{
     public void printAll(){
         System.out.println("" + vin + " " + sales +
                            " " + avgSalePrice + " " + violations);
+    }
+
+    public void printRecord(){
+        System.out.print("+-----------------------------------------------------+\n" +
+                         "|  Number of Sales: " + sales + "\n" +
+                         "|  Average Sale Price: ");
+        System.out.format("%.2f%n",avgSalePrice);
+        System.out.println("|  Number of Violations: " + violations + "\n" +
+                           "+-----------------------------------------------------+");
     }
 }

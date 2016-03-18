@@ -142,7 +142,7 @@ public class VehicleSearch{
 
         Map<String,VehicleHistoryObj> m = new HashMap<>();
         String s = new String();
-        
+        float i = 0;
         try{
             // While records to process
             while(rs.next()){
@@ -160,8 +160,8 @@ public class VehicleSearch{
                 s = rs.getString("sales");
                 d.setSales(s);
 
-                s = rs.getString("avg_sale_price");
-                d.setAvgSalePrice(s);
+                i = rs.getFloat("avg_sale_price");
+                d.setAvgSalePrice(i);
 
                 s = rs.getString("violations");
                 d.setViolations(s);
@@ -183,7 +183,7 @@ public class VehicleSearch{
         VehicleHistoryObj d;
         for(String k: m.keySet()){
             d = m.get(k);
-            d.printAll();            
+            d.printRecord();            
         }
         System.out.println();
     }
