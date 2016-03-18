@@ -50,6 +50,54 @@ public class ViolationRecord {
     // Begin asking user for input:
     System.out.print("Please fill out the following details within the constrictions: \n");
 
+    // Ask user for ticket#
+    // If ticket# exists, try again or exit to main menu
+    while(true) {
+      System.out.print("(Integer) Ticket#: ");
+      i = scanner.nextLine();
+      if(i.isEmpty()) i=null;
+      try {
+        // make sure input is valid
+        h.checkValidity(i, 100, "Integer", true);
+        m = Integer.parseInt(i);
+        // Make sure ticket# does not exist
+        query = "Select ticket_no from ticket";
+        rs = Login.stmt.executeQuery(query);
+        int id;
+        while(rs.next()) {
+          id = rs.getInt("ticket_no");
+          // If a match is found, throw exception
+          if(id == m) {
+            throw new DNEException();
+          }
+        }
+        // If we make it here, we can set it.
+        vio.setTicketNo(m);
+        break;
+      } catch(CantBeNullException e) {
+        System.out.println("Please enter a valid Ticket#: ");
+      } catch(TooLongException e) {
+        System.out.println("Please enter a shorter Ticket#: ");
+      } catch (NumberFormatException e) {
+        System.out.println("Please enter a number: ");
+      } catch (SQLException e) {
+        System.out.println("SQL Fail. Try again.");
+      } catch(DNEException e) {
+        System.out.println("Ticket# already exists. Try again(T) or return to Main Menu(other)?");
+        // If the transaction_id already exists, try again or quit to mainMenu
+        String input = scanner.nextLine();
+        if(input.equalsIgnoreCase("T")) {
+          switch(input.toLowerCase()) {
+          case "t":
+            break;
+          }
+        } else {
+          System.out.println("Goodbye!");
+          return;
+        }
+      }
+    }
+
     // Ask user for OfficerId:
     // If person DNE, try again or create person
     while(true) {
@@ -59,7 +107,23 @@ public class ViolationRecord {
       // TODO: Check if person exists or not
       // if DNE, try again or create person
       try {
+        // Check that input is valid
         h.checkValidity(i, 15, "String", false);
+        // Make sure person exists
+        query = "Select sin from people";
+        rs = Login.stmt.executeQuery(query);
+        String id = new String();
+        while(rs.next()) {
+          id = rs.getString("sin").trim().toLowerCase();
+          // If a match is found, set officer id and break out of loop
+          if(id.equals(i.toLowerCase())) {
+            vio.setOfficeNo(id);
+            break;
+          }
+        }
+        if(!id.equals(i.toLowerCase())) {
+          throw new DNEException();
+        }
         break;
       } catch(CantBeNullException e) {
         System.out.println("Please enter a valid Officer Id: ");
@@ -67,10 +131,26 @@ public class ViolationRecord {
         System.out.println("Please enter a shorter Officer Id: ");
       } catch(NumberFormatException e) {
         System.out.println("Please enter a string Officer Id: ");
+      } catch(SQLException e) {
+        System.out.println("SQL Fail. Try again.");
+      } catch(DNEException e) {
+        System.out.println("Person does not exist. Try again(T), Register person(R), or return to Main Menu(other)");
+        // If officer DNE then try again, register, or return to main menu.
+        String input = scanner.nextLine();
+        if(input.equalsIgnoreCase("T") || input.equalsIgnoreCase("R")) {
+          switch(input.toLowerCase()) {
+          case "t":
+            break;
+          case "r":
+            noob.addPeople();
+            break;
+          }
+        } else {
+          System.out.println("Goodbye!");
+          return;
+        }
       }
     }
-    // Everything checks out, set the Officer Id
-    vio.setOfficeNo(i);
 
     // Ask User for ViolatorId:
     while(true) {
@@ -80,7 +160,23 @@ public class ViolationRecord {
       // TODO: check if person exists
       // if DNE, try again or create person
       try {
+        // Check that input is valid
         h.checkValidity(i, 15, "String", false);
+        // Make sure person exists
+        query = "Select sin from people";
+        rs = Login.stmt.executeQuery(query);
+        String id = new String();
+        while(rs.next()) {
+          id = rs.getString("sin").trim().toLowerCase();
+          // If a match is found, set buyer id and break out of loopo
+          if(id.equals(i.toLowerCase())) {
+            vio.setViolatorNo(id);
+            break;
+          }
+        }
+        if(!id.equals(i.toLowerCase())) {
+          throw new DNEException();
+        }
         break;
       } catch(CantBeNullException e) {
         System.out.println("Please enter a valid Violator Id: ");
@@ -88,73 +184,53 @@ public class ViolationRecord {
         System.out.println("Please enter a shorter Violator Id: ");
       } catch(NumberFormatException e) {
         System.out.println("Please enter a string Violator Id: ");
-      }
-    }
-    // Everything checks out, set the ViolatorId:
-    vio.setViolatorNo(i);
-
-    // Ask user for VehicleId:
-    // If vehicle does not exist, then tell user to:
-    // a) try again
-    // b) go to VehicleReg from Main Menu and come back later
-    while(true) {
-      System.out.print("(15 Characters) Vehicle Id: ");
-      i = scanner.nextLine().trim();
-      if(i.isEmpty()) i=null;
-      // TODO: make sure vehicle exists. If not, try again or go to main menu
-      try {
-        // Make sure input is valid input
-        h.checkValidity(i, 15, "String", false);
-        // Make sure vehicle exists
-        query = "Select serial_no from vehicle";
-        rs = Login.stmt.executeQuery(query);
-        String id = new String();
-        while(rs.next()) {
-          id = rs.getString("serial_no").trim().toLowerCase();
-          // If a match is found, set vehicle Id and break out of loop
-          if(id.equals(i.toLowerCase())) {
-            vio.setVehicleID(id);
-            break;
-          }
-        }
-        // If the id is not i, then return that it does not exist
-        if(!id.equals(i.toLowerCase())) {
-          throw new DNEException();
-        }
-        break;
-      } catch(CantBeNullException e) {
-        System.out.println("Please enter a valid Vehicle Id: ");
-      } catch(TooLongException e) {
-        System.out.println("Please enter a shorter Vehicle Id: ");
-      } catch(NumberFormatException e) {
-        System.out.println("Please enter a string Vehicle Id: ");
       } catch(SQLException e) {
         System.out.println("SQL Fail. Try again.");
       } catch(DNEException e) {
-        System.out.println("Vehicle does not exist. Try again(T) or return to Main Menu(other)?: ");
-      // If the vehicle does not exist, then either try again
-      // Or go back to main menu.
-      String input = scanner.nextLine();
-      if(input.equalsIgnoreCase("T")) {
-        switch(input.toLowerCase()) {
-        case "t":
-          break;
+        System.out.println("Person does not exist. Try again(T), Register a person(R), or return to Main Menu(other)?");
+        // If the buyer does not exist, then either try again
+        // or register a new person or quite to mainMenu.
+        String input = scanner.nextLine();
+        if(input.equalsIgnoreCase("T") || input.equalsIgnoreCase("R")) {
+          switch(input.toLowerCase()) {
+          case "t":
+            break;
+          case "r":
+            noob.addPeople();
+            break;
+          }
+        } else {
+          System.out.println("Goodbye!");
+          return;
         }
-      } else {
-        System.out.println("See you soon.");
-        return;
       }
     }
 
     // Ask user for VType:
     while(true) {
       System.out.print("(10 Characters) Violation Type: ");
-      i = scanner.nextLine();
+      i = scanner.nextLine().replaceAll("\\s+","");
       if(i.isEmpty()) i=null;
       // TODO: make sure it is a valid VType.
       // If not, try again.
       try {
+        // Make sure input is valid
         h.checkValidity(i, 10, "String", false);
+        // Make sure input is a type in violation table
+        query = "select vtype from ticket_type";
+        rs = Login.stmt.executeQuery(query);
+        String id = new String();
+        while(rs.next()) {
+          id = rs.getString("vtype").toLowerCase().trim();
+          // if match is found, throw exception
+          if(id.equals(i.toLowerCase())) {
+            vio.setVtype(id);
+            break;
+          }
+        }
+        if(!id.equals(i.toLowerCase())) {
+          throw new DNEException();
+        }           
         break;
       } catch(CantBeNullException e) {
         System.out.println("Please enter a valid Violation Type: ");
@@ -162,10 +238,22 @@ public class ViolationRecord {
         System.out.println("Please enter a shorter Violation Type: ");
       } catch(NumberFormatException e) {
         System.out.println("Please enter a string Violation Type: ");
+      } catch(SQLException e) {
+        System.out.println("SQL Fail. Try again");
+      } catch(DNEException e) {
+        System.out.println("Not a Type. Try again(T) or return to Main Menu(other)?");
+        String input = scanner.nextLine();
+        if(input.equalsIgnoreCase("T")) {
+          switch(input.toLowerCase()) {
+          case "t":
+            break;
+          }
+        } else {
+          System.out.println("Goodbye!");
+          return;
+        }
       }
     }
-    // Everything checks out, set the VType:
-    vio.setVtype(i);
 
     // Ask user for Location:
     while(true) {
@@ -173,7 +261,7 @@ public class ViolationRecord {
       i = scanner.nextLine();
       if(i.isEmpty()) i=null;
       try {
-        h.checkValidity(i, 20, "String", false);
+        h.checkValidity(i, 20, "String", true);
         break;
       } catch(CantBeNullException e) {
         System.out.println("Please enter a valid Location: ");
@@ -193,6 +281,7 @@ public class ViolationRecord {
       if(i.isEmpty()) i=null;
       try {
         h.checkValidity(i, 1024, "String", true);
+        vio.setDescriptions(i);
         break;
       } catch(CantBeNullException e) {
         System.out.println("Please enter a valid Comment: ");
@@ -202,13 +291,10 @@ public class ViolationRecord {
         System.out.println("Please enter a string Comment: ");
       }
     }
-    // Everything checks out, set the Comments:
-    vio.setDescriptions(i);
-  
 
     // Confirm Violation Record
-    System.out.print("Are you sure you want to make these changes? Y/N:\n");
-    // TODO: Set a record Id
+    System.out.print("Make changes(Y/N) or return to Main Menu(other)?:\n");
+    // Set date as today's date
     java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
     vio.setVDate(today);
     vio.printAll();
@@ -225,16 +311,17 @@ public class ViolationRecord {
         break;
       }
     } else {
-      System.out.println("Invalid Input!");
+      System.out.println("Goodbye!");
     }
 
     // TODO: Update database with ingormation given.
     // Tables required: ticket
   }
-}
+
 
 public void finRecord(ViolationObj vio) {
   System.out.println("Record Complete!");
 }
-
 }
+
+

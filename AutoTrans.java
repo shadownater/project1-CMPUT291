@@ -252,7 +252,6 @@ public void addTransaction() {
     System.out.print("(Integer)                    | Transaction #: ");
     i = scanner.nextLine();
     if(i.isEmpty()) i=null;
-    // TODO: Check if Transaction # is valid
     try {
       // Make sure input is valid
       h.checkValidity(i, 100, "Integer", true);
@@ -320,7 +319,7 @@ public void addTransaction() {
   }
   
   // Confirm Auto Transaction
-  System.out.print("Make changes(Y/N) or return to Main Menu(other):\n");
+  System.out.print("Make changes(Y/N) or return to Main Menu(other)?:\n");
   // Automatically set transaction date to the current date
   java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
   trans.setSDate(today);
