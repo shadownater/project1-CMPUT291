@@ -15,6 +15,7 @@ public class DriverReg{
   Helpers h;
   DriverObj dL;
   PeopleObj person;
+  Restrictions res;
   
   final String STRING_TYPE = "String";
   final String NUM_TYPE = "Integer";
@@ -25,16 +26,17 @@ public DriverReg(){
   h = new Helpers();
   dL = new DriverObj();
   person = new PeopleObj();
+  res = new Restrictions();
 }
 
 //displays the menu for driver licence registration
 public void driverRegMenu(){
-  System.out.println("Would you like to register a new licence? Y/N\nOr would you like to register a person? P");
+  System.out.println("Would you like to register a new licence? Y/N\nOr would you like to register a person? P\nOR add a driving condition to a licence? C");
 
 
   String input = scanner.nextLine();
 
-  if(input.equalsIgnoreCase("Y") || input.equalsIgnoreCase("N") || input.equalsIgnoreCase("P")){
+  if(input.equalsIgnoreCase("Y") || input.equalsIgnoreCase("N") || input.equalsIgnoreCase("P") || input.equalsIgnoreCase("C")){
     switch(input.toLowerCase()){
     case "y":
       addLicence();
@@ -45,6 +47,10 @@ public void driverRegMenu(){
 
     case "p":
       addPeople();
+      break;
+
+    case "c":
+      drivingConditionsMenu();
     }
 
   }else{
@@ -228,7 +234,8 @@ public void confirmEntries(DriverObj drive){
       //**upload data to database here!
       
       if(!checkDriver(drive)){
-        commitDriver(drive); 
+        commitDriver(drive);
+        drivingConditionsMenu();
       }
          else System.out.println("Driver's licence already exists in the database. Please try again."); 
       break;  
@@ -627,5 +634,195 @@ public void commitDriver(DriverObj dl){
   }
   
 }
-  
+
+  public void drivingConditionsMenu(){
+    System.out.println("Would you like to add driving conditions? Y/N");
+
+    String input = scanner.nextLine();
+
+    if(input.equalsIgnoreCase("Y") || input.equalsIgnoreCase("N")){
+      switch(input.toLowerCase()){
+      case "y":
+        addDrivingConditions();
+        break;
+
+      case "n":
+        break;
+      }
+
+    }else{
+      System.out.println("Invalid input!");
+      drivingConditionsMenu();
+    }
+    
+    
+  }//end of drivingConditionsMenu
+
+  public void addDrivingConditions(){
+
+    System.out.println("Please provide the licence number: ");
+    
+    String lNo = scanner.nextLine();
+
+    //check if that is valid, otherwise tell them to go make a licence and exit
+
+    while(true){
+      try{
+        
+      boolean result = checkLicence(lNo);
+      if(result) break;
+      else{ System.out.println("Licence does not exist. Forwarding user to make a licence...\n");
+        driverRegMenu();
+        return;
+      }
+      }catch(CantBeNullException e){
+        //this is never gonna be thrown but im too tired to
+        System.out.println("Cannot be null. Forwarding user to make a licence...");
+        driverRegMenu();
+        return;
+      }
+    }
+    
+    
+    
+    //this stuff is for when it is valid!
+    System.out.println("Add a driving condition. Here are some below:\n");
+
+    //display what already exists in the database and provide
+    //the id for each that they can type in
+    displayConditions();
+
+    displayInstructions();
+    
+    String i;
+    while(true){
+      try{
+      i = scanner.nextLine();
+      if(i.isEmpty() || i.equalsIgnoreCase("QUIT")) break;
+      else if(i.equalsIgnoreCase("NEW")){
+
+        System.out.println("Enter the description of your new condition:");
+        String d = scanner.nextLine();
+        if(d.isEmpty()) d=null;
+        System.out.println("And the Id number?");
+        String id = scanner.nextLine();
+        if(id.isEmpty()) id=null;
+        addNewCondition(d, id);
+      }else if(i.equalsIgnoreCase("DONE")) commitConditions();
+
+      //get here if the user is entering a number in the table
+      addC(i);
+
+      }catch(TakenException e){
+        System.out.println("description or id is already taken. Please try again.\n");
+        displayInstructions();
+      }catch(CantBeNullException e){
+        System.out.println("Expected input for new driving condition. Both fields must be filled. Please try again.\n");
+        displayInstructions();
+      }
+    }
+    
+  }// end of add DrivingConditions
+
+  public void displayConditions(){
+
+    String query = "select c_id, description from driving_condition";
+    boolean duh=true;
+    try{
+
+      ResultSet rs = Login.stmt.executeQuery(query);
+
+      //check if returned anything or not
+
+      duh = rs.next();
+
+      int c_id;
+      String desc;
+
+      if(duh){
+        do{
+          c_id =rs.getInt("C_ID");
+          desc = rs.getString("DESCRIPTION");
+          System.out.println("Id No: " + c_id + " || " + desc);
+        }while(rs.next());
+      }else{
+        System.out.println("Empty conditions table!");}
+
+      System.out.println();
+      
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+
+        
+  }
+
+  public void displayInstructions(){
+    System.out.println("Type the number and hit enter to add the condition.\n" +
+                       "Please only add the condition once.\n" +
+                       "If you would like to add a new condition, type 'new'.\n" +
+                       "When you are done, type 'done'.\n" +
+                       "If you would like to quit with no changes, type 'quit'\n"
+                       +
+                       "If you made a mistake, type 'restart' and you can begin again.\n");
+    
+  }
+
+//checks adding an entirely NEW driving condition (by description)
+  public void addNewCondition(String condition, String idNum)throws TakenException, CantBeNullException{
+    //first make sure it is not already in the set
+    //both uncommitted and committed
+
+    if(condition ==null || idNum ==null){
+      System.out.println("THREW!");
+      throw new CantBeNullException();
+    }
+    //then, add it to a conditions table object (to make)
+    //then, add it to restrictions object
+    //throw exception if already in the table or if the id is not a number
+    //(they can give whatever number they want, as long as its not already taken)
+    //"description or id is already taken. Please try again."
+    
+    
+  }
+
+//commits the user's inputs to the database
+//both to restrictions and to driving conditions
+  public void commitConditions(){
+  }
+
+//checks if the licence is valid
+//true if it exists
+//false if it doesn't
+  public boolean checkLicence(String input) throws CantBeNullException{
+
+    if(input==null) throw new CantBeNullException();
+    else{
+      String query = "select licence_no from drive_licence where UPPER(licence_no)='" + input.toUpperCase() + "'";
+    boolean duh=true;
+    try{
+
+      ResultSet rs = Login.stmt.executeQuery(query);
+
+      //check if returned anything or not
+
+      duh = rs.next();
+
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+
+    if(duh)return true;
+    else return false;
+    
+    }
+        
+  }
+
+//adds a driving condition that was listed on the list already. Only add
+//it to the restriction object, no to the driving condition object
+  public void addC(String i){
+  }
 }
