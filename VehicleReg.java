@@ -475,7 +475,7 @@ public void addOwner(){
 public void commitOwner(Owner own){
 
   String query = own.createInsertStatement();
-  System.out.println(query);
+  
   
   try{
     Login.stmt.executeUpdate(query);

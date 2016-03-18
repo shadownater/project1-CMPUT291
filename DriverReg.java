@@ -583,7 +583,6 @@ public void commitPerson(PeopleObj per){
   //create SQL insert statement
 
   String statement = per.createInsertStatement();
-  System.out.println(statement);
 
   
   try{
@@ -665,21 +664,23 @@ public void commitDriver(DriverObj dl){
     System.out.println("Please provide the licence number: ");
     
     String lNo = scanner.nextLine();
-
+    if (lNo.isEmpty())lNo=null;
+    
     //check if that is valid, otherwise tell them to go make a licence and exit
 
     while(true){
       try{
         
-      boolean result = checkLicence(lNo);
-      if(result) break;
-      else{ System.out.println("Licence does not exist. Forwarding user to make a licence...\n");
+        String result = checkLicence(lNo); 
+        res.setLicenceNo(result);
+        break;
+      }catch(CantBeNullException e){
+        
+        System.out.println("Cannot be null.\n");
         driverRegMenu();
         return;
-      }
-      }catch(CantBeNullException e){
-        //this is never gonna be thrown but im too tired to
-        System.out.println("Cannot be null. Forwarding user to make a licence...");
+      }catch(DNEException e){
+        System.out.println("Licence does not exist.\n");
         driverRegMenu();
         return;
       }
@@ -688,13 +689,20 @@ public void commitDriver(DriverObj dl){
     
     
     //this stuff is for when it is valid!
-    System.out.println("Add a driving condition. Here are some below:\n");
-
+    System.out.println("\nAdd a driving condition. Here are some below:\n");
+    System.out.println("--------------------------------\n");
     //display what already exists in the database and provide
     //the id for each that they can type in
+
     displayConditions();
 
+    System.out.println("\n--------------------------------");
+    
+    
     displayInstructions();
+
+    
+    
     
     String i;
     while(true){
@@ -709,24 +717,27 @@ public void commitDriver(DriverObj dl){
         System.out.println("And the Id number?");
         String id = scanner.nextLine();
         if(id.isEmpty()) id=null;
-        addNewCondition(d, id);
+        addNewCondition(d, id, res, cond);
+
       }else if(i.equalsIgnoreCase("DONE")){
-        commitConditions();
+        commitConditions(res, cond);
+        break;
       }else if(i.equalsIgnoreCase("RESTART")){
         resetCondRes(res, cond);
       }else{
       //get here if the user is entering a number in the table
-        addC(i, res);
-        displayInstructions();
+        addC(i, res, cond);
 
       }
       
       }catch(TakenException e){
         System.out.println("description or id is already taken. Please try again.\n");
-        displayInstructions();
       }catch(CantBeNullException e){
-        System.out.println("Expected input for new driving condition. Both fields must be filled. Please try again.\n");
-        displayInstructions();
+        System.out.println("Expected input for new driving condition. Both fields must be filled.\nPlease try again.\n");
+      }catch(NumberFormatException e){
+        System.out.println("Required a number input. Please try again.");
+      }catch(DNEException e){
+        System.out.println("Could not add input.\n");
       }
     }
     
@@ -774,11 +785,15 @@ public void commitDriver(DriverObj dl){
                        "If you would like to quit with no changes, type 'quit'\n"
                        +
                        "If you made a mistake, type 'restart' and you can begin again.\n");
+
+    System.out.println("--------------------------------\n");
+    
     
   }
 
 //checks adding an entirely NEW driving condition (by description)
-  public void addNewCondition(String condition, String idNum)throws TakenException, CantBeNullException{
+//adds this new condition automatically to the licence
+  public void addNewCondition(String condition, String idNum, Restrictions r, ConditionObj c)throws TakenException, CantBeNullException{
     //first make sure it is not already in the set
     //both uncommitted and committed
 
@@ -786,28 +801,139 @@ public void commitDriver(DriverObj dl){
       throw new CantBeNullException();
     }
 
-    //check against what you have
     //check against the database
+    //does the number theyre trying to add already in use? same with description
+    //so two queries
+
+    //1 - check the number in the database, and with what you have
+
+    //checks if number even exists in driving conditions table
+
+    String query = "select c_id from driving_condition where c_id=" + idNum;
+
+    boolean duh=true;
+    try{
+      
+      ResultSet rs = Login.stmt.executeQuery(query);
+      
+      //check if returned anything or not
+      
+      duh = rs.next();
+      
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+  
+    if(duh) throw new TakenException();
+    else{
     
-    //then, add it to a conditions table object (to make)
-    //then, add it to restrictions object
-    //throw exception if already in the table or if the id is not a number
-    //(they can give whatever number they want, as long as its not already taken)
-    //"description or id is already taken. Please try again."
+    boolean result = checkConditionNo(idNum, r, c, false); 
+    if(!result) throw new TakenException();
+    else{
     
-    
+    //check the description against database and what you have
+    //database check
+
+      String query2 = "select description from driving_condition where UPPER(description)='" + condition + "'";
+
+      duh=true;
+      try{
+
+        ResultSet rs = Login.stmt.executeQuery(query2);
+
+        //check if returned anything or not
+
+        duh = rs.next();
+
+      }catch(SQLException ex) {
+        System.err.println("SQLException: " +
+                           ex.getMessage());
+      }
+
+      if(duh)throw new TakenException();
+      else{
+        //against what we have for descriptions...
+
+        ArrayList<String> temp = c.getDescription();
+        int count=0;
+        
+        while(count < temp.size()){
+          if(condition.equals(temp.get(count))) throw new TakenException();
+          count++;
+        }
+      
+        //then, add it to a conditions table object (to make)
+        
+        c.addDescription(condition);
+        c.addCid(idNum);
+        //then, add it to restrictions object
+        r.addCondition(idNum);
+
+        System.out.println("Added new condition. It has been added to the licence.");
+      }
+    }
+  }
   }
 
 //commits the user's inputs to the database
 //both to restrictions and to driving conditions
-  public void commitConditions(){
+  public void commitConditions(Restrictions r, ConditionObj c){
+    //anything that has made it into the two objects at this
+    //point are valid. not really anything to worry about here
+
+    String query;
+    
+    //need to commit the driving conditions first
+    if(!c.getCid().isEmpty()){
+      int count=0;
+
+      while(count < c.getCid().size()){
+        query = "insert into driving_condition values(" + c.getCid().get(count) + ", '" + c.getDescription().get(count) + "')";
+
+        //commit the query to the database
+        try{
+          Login.stmt.executeUpdate(query);
+          System.out.println("New condition #" + c.getCid().get(count) + " successfully added to the database!");
+        }catch(SQLException ex) {
+          System.err.println("SQLException: " +
+                             ex.getMessage());
+        }
+        
+        count++;
+      }
+    }
+    
+      //now commit the restrictions
+    if(!r.getConditions().isEmpty()){
+    int count=0;
+    
+    while(count < r.getConditions().size()){
+      query = " insert into restriction values('" + r.getLicenceNo() + "', " + r.getConditions().get(count) + ")";
+
+      //commit the query to the database
+      try{
+        Login.stmt.executeUpdate(query);
+        System.out.println("Restriction #" + r.getConditions().get(count) + " successfully added to the licence!");
+      }catch(SQLException ex) {
+        System.err.println("SQLException: " +
+                           ex.getMessage());
+      }
+      
+      
+      count++;
+      
+    }
+    }
+    
   }
 
 //checks if the licence is valid
 //true if it exists
 //false if it doesn't
-  public boolean checkLicence(String input) throws CantBeNullException{
-
+  public String checkLicence(String input) throws CantBeNullException, DNEException{
+    String value=null;
+    
     if(input==null) throw new CantBeNullException();
     else{
       String query = "select licence_no from drive_licence where UPPER(licence_no)='" + input.toUpperCase() + "'";
@@ -820,32 +946,118 @@ public void commitDriver(DriverObj dl){
 
       duh = rs.next();
 
+
+      if(duh){
+        value = rs.getString("licence_no");
+        
+      }else throw new DNEException();
+      
+      
     }catch(SQLException ex) {
       System.err.println("SQLException: " +
                          ex.getMessage());
     }
 
-    if(duh)return true;
-    else return false;
-    
+    return value;
     }
         
   }
 
-//adds a driving condition that was listed on the list already. Only add
-//it to the restriction object, no to the driving condition object
-  public void addC(String i, Restrictions r){
-    //check: is this a number? is it a valid number from the list?
+//adds a driving condition that was listed in the list already. Only add
+//it to the restriction object, not to the driving condition object
+  public void addC(String i, Restrictions r, ConditionObj cond)throws NumberFormatException, DNEException{
+    //check: is this a number?
+    Integer.parseInt(i);
+
+    //is it a valid number from the list?
+    boolean result = checkConditionNo(i, r, cond, true);
+    
+    if(result){
     r.addCondition(i);
     System.out.println("Added condition " + i + " to the licence.");
+    }else throw new DNEException();
   }
 
 //resets the conditions and restrictions objects. Clears them.
   public void resetCondRes(Restrictions r, ConditionObj c){
     r.getConditions().clear();
-    System.out.println("First item in res is: '" + r.getConditions().get(0) + "'");
+    
 
     c.getDescription().clear();
-    System.out.println("First item in cond is: '" + c.getDescription().get(0) + "'");
+    c.getCid().clear();
+    
+    System.out.println("Your uncommitted conditions and new conditions have been cleared.");
+  }
+
+//checks if the inputted number exists in the driving conditions table
+//for that licence, or if you have already added it to the temporary object  
+//returns true if it exists and you can add it safely, and false if it does not
+  public boolean checkConditionNo(String i, Restrictions r, ConditionObj cond, boolean checkCondTable){
+    //check database for that licence
+    String query = "Select r_id, licence_no from restriction where r_id=" + i +
+      " and UPPER(licence_no)='"+ r.getLicenceNo().toUpperCase() +"'";
+    
+    boolean duh=true;
+    try{
+
+      ResultSet rs = Login.stmt.executeQuery(query);
+
+      //check if returned anything or not
+      //its true if the condition is already in the restrictions table for that licence
+      duh = rs.next();
+
+    }catch(SQLException ex) {
+      System.err.println("SQLException: " +
+                         ex.getMessage());
+    }
+
+    if(duh)return false;
+    else{
+      if(!checkCondTable)duh = true;
+      else{
+      
+      //checks if number even exists in driving conditions table
+
+      String query2 = "select c_id from driving_condition where c_id=" + i;
+
+      duh=true;
+      try{
+
+        ResultSet rs = Login.stmt.executeQuery(query2);
+
+        //check if returned anything or not
+
+        duh = rs.next();
+
+      }catch(SQLException ex) {
+        System.err.println("SQLException: " +
+                           ex.getMessage());
+      }
+      }
+      
+      if(!duh) return false; 
+      else{
+      //check local objects
+          ArrayList<String> temp = r.getConditions();
+          int count=0;
+          
+          while(count < temp.size()){
+            if(i.equals(temp.get(count))) return false;
+            count++;
+          }
+
+          ArrayList<String> temp2 = cond.getCid();
+          count=0;
+          
+          while(count < temp2.size()){
+            if(i.equals(temp2.get(count))) return false;
+            count++;
+          }
+
+          return true;
+          
+        }
+      
+    }
   }
 }

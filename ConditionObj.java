@@ -3,8 +3,8 @@ import java.sql.*;
 import java.io.*;
 
 public class ConditionObj{
-  List<String> c_id = new ArrayList<String>();
-  List<String> description = new ArrayList<String>();
+  ArrayList<String> c_id = new ArrayList<String>();
+  ArrayList<String> description = new ArrayList<String>();
 
 
   //setters
@@ -17,11 +17,11 @@ public class ConditionObj{
  }
 
   //getters
-  public List<String> getCid(){
+  public ArrayList<String> getCid(){
     return c_id;
   }
 
-  public List<String> getDescription(){
+  public ArrayList<String> getDescription(){
     return description;
   }
 }
