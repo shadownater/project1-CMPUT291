@@ -16,6 +16,7 @@ public class DriverReg{
   DriverObj dL;
   PeopleObj person;
   Restrictions res;
+  ConditionObj cond;
   
   final String STRING_TYPE = "String";
   final String NUM_TYPE = "Integer";
@@ -27,6 +28,7 @@ public DriverReg(){
   dL = new DriverObj();
   person = new PeopleObj();
   res = new Restrictions();
+  cond = new ConditionObj();
 }
 
 //displays the menu for driver licence registration
@@ -708,11 +710,17 @@ public void commitDriver(DriverObj dl){
         String id = scanner.nextLine();
         if(id.isEmpty()) id=null;
         addNewCondition(d, id);
-      }else if(i.equalsIgnoreCase("DONE")) commitConditions();
-
+      }else if(i.equalsIgnoreCase("DONE")){
+        commitConditions();
+      }else if(i.equalsIgnoreCase("RESTART")){
+        resetCondRes(res, cond);
+      }else{
       //get here if the user is entering a number in the table
-      addC(i);
+        addC(i, res);
+        displayInstructions();
 
+      }
+      
       }catch(TakenException e){
         System.out.println("description or id is already taken. Please try again.\n");
         displayInstructions();
@@ -775,9 +783,12 @@ public void commitDriver(DriverObj dl){
     //both uncommitted and committed
 
     if(condition ==null || idNum ==null){
-      System.out.println("THREW!");
       throw new CantBeNullException();
     }
+
+    //check against what you have
+    //check against the database
+    
     //then, add it to a conditions table object (to make)
     //then, add it to restrictions object
     //throw exception if already in the table or if the id is not a number
@@ -823,6 +834,18 @@ public void commitDriver(DriverObj dl){
 
 //adds a driving condition that was listed on the list already. Only add
 //it to the restriction object, no to the driving condition object
-  public void addC(String i){
+  public void addC(String i, Restrictions r){
+    //check: is this a number? is it a valid number from the list?
+    r.addCondition(i);
+    System.out.println("Added condition " + i + " to the licence.");
+  }
+
+//resets the conditions and restrictions objects. Clears them.
+  public void resetCondRes(Restrictions r, ConditionObj c){
+    r.getConditions().clear();
+    System.out.println("First item in res is: '" + r.getConditions().get(0) + "'");
+
+    c.getDescription().clear();
+    System.out.println("First item in cond is: '" + c.getDescription().get(0) + "'");
   }
 }
