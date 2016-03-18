@@ -26,6 +26,7 @@ public AutoTrans() {
 }
 
 public void autoTransMenu() {
+  // Confirm this is where you want to be
   System.out.print("Would you like to register a transaction? Y/N : ");
 
   String input = scanner.nextLine();
@@ -41,6 +42,7 @@ public void autoTransMenu() {
     }
     
   } else {
+    // Return to main menu anyways
     System.out.println("Invalid input!");
   }
 }
@@ -51,7 +53,6 @@ public void addTransaction() {
   float n;
   int m;
   String i;
-  String s;
   String query;
   ResultSet rs;
   
@@ -95,7 +96,7 @@ public void addTransaction() {
     } catch (SQLException e) {
       System.out.println("SQL Fail. Try again.");
     } catch (DNEException e) {
-      System.out.println("Vehicle does not exist. Try again(T) or return to Main Menu(other)?: ");
+      System.out.println("Vehicle does not exist. Try again(T) or \nreturn to Main Menu to complete an Auto Registration(other)?: ");
       // If the vehicle does not exist, then either try again
       // Or go back to main menu.
       String input = scanner.nextLine();
@@ -129,13 +130,28 @@ public void addTransaction() {
         id = rs.getString("sin").trim().toLowerCase();
 	// If a match is found, set seller ID and break out of loop
         if(id.equals(i.toLowerCase())) {
-          trans.setSellerId(id);
+          query = "Select owner_id from owner where LOWER(vehicle_id) = '" + trans.getVehicleId().toLowerCase() + "'";
+          rs = Login.stmt.executeQuery(query);
+          String own = new String();
+          while(rs.next()) {
+            own = rs.getString("owner_id").toLowerCase().trim();
+            // If a match is found, set seller ID and break out of loop.
+            if(own.equals(id.toLowerCase())) {
+              trans.setSellerId(id);
+              break;
+            }
+          }
+          if(!own.equals(i.toLowerCase())) {
+            throw new NotOwnerException();
+          }
           break;
         }
       }
       if(!id.equals(i.toLowerCase())) {
         throw new DNEException();
       }
+      
+      
       break;
       // if the id is not i, then return that it does not exist
     } catch(CantBeNullException e) {
@@ -158,6 +174,20 @@ public void addTransaction() {
 	case "r":
 	  noob.addPeople();
 	  break;
+        }
+      } else {
+        System.out.println("Goodbye!");
+        return;
+      }
+    } catch(NotOwnerException e) {
+      System.out.println("Person is not the owner. Try again(T), or return to main Menu(other)?: ");
+      // If the seller does not exist, then either try again
+      // Or register a new person or Quit to mainMenu.
+      String input = scanner.nextLine();
+      if(input.equalsIgnoreCase("T")) {
+        switch(input.toLowerCase()) {
+        case "t":
+          break;
         }
       } else {
         System.out.println("Goodbye!");
@@ -331,7 +361,7 @@ public void finTrans(TransactionObj trans) {
     ", " + trans.getPrice() + ")";
   System.out.println(createString);
 
-  String query = "select LOWER(owner_id)" +
+  String query = "select owner_id" +
     " from owner" +
     " where LOWER(vehicle_id) = LOWER('" + trans.getVehicleId() + "') " +
     "and LOWER(owner_id) = LOWER('" + trans.getSellerId() + "')";
@@ -344,13 +374,9 @@ public void finTrans(TransactionObj trans) {
     String u = trans.getBuyerId();
     
     rs.first();
-    rs.updateString("LOWER(owner_id)",u);
+    rs.updateString("owner_id",u);
     rs.updateRow();
     
-    while (rs.next()) {
-      String s = rs.getString("LOWER(owner_id)");
-      System.out.println(s);
-    }
     System.out.println("Transaction Complete! Goodbye!");
   } catch(SQLException e) {
     System.err.println("SQL Fail: " + e.getMessage());
