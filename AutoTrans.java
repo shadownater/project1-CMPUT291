@@ -68,7 +68,6 @@ public void addTransaction() {
     try {
       // Make sure input is valid input
       h.checkValidity(i, 15, "String", false);
-      i.toLowerCase();
       // Make sure vehicle exists
       query = "Select serial_no from vehicle";
       rs = Login.stmt.executeQuery(query);
@@ -76,13 +75,13 @@ public void addTransaction() {
       while(rs.next()) {
         id = rs.getString("serial_no").trim().toLowerCase();
 	// If a match is found, set vehicle ID and break out of loop
-        if(id.equals(i)) {
-          trans.setVehicleId(i);
+        if(id.equals(i.toLowerCase())) {
+          trans.setVehicleId(id);
 	  break;
         }
       }
       // If the id is not i, then return that it does not exist
-      if(!id.equals(i)) {
+      if(!id.equals(i.toLowerCase())) {
         throw new DNEException();
       }
       break;
@@ -126,14 +125,14 @@ public void addTransaction() {
       rs = Login.stmt.executeQuery(query);
       String id = new String();
       while(rs.next()) {
-        id = rs.getString("sin").trim();
+        id = rs.getString("sin").trim().toLowerCase();
 	// If a match is found, set seller ID and break out of loop
-        if(id.equals(i)) {
-          trans.setSellerId(i);
+        if(id.equals(i.toLowerCase())) {
+          trans.setSellerId(id);
           break;
         }
       }
-      if(!id.equals(i)) {
+      if(!id.equals(i.toLowerCase())) {
         throw new DNEException();
       }
       break;
@@ -179,14 +178,14 @@ public void addTransaction() {
       rs = Login.stmt.executeQuery(query);
       String id = new String();
       while(rs.next()) {
-        id = rs.getString("sin").trim();
+        id = rs.getString("sin").trim().toLowerCase();
         // If a match is found, set buyer id and break out of loopo
-        if(id.equals(i)) {
-          trans.setBuyerId(i);
+        if(id.equals(i.toLowerCase())) {
+          trans.setBuyerId(id);
           break;
         }
       }
-      if(!id.equals(i)) {
+      if(!id.equals(i.toLowerCase())) {
         throw new DNEException();
       }
       break;
@@ -272,15 +271,20 @@ public void addTransaction() {
     if(i.isEmpty()) i=null;
     try{
       h.checkDecimal(i, 9, 2, true);
-      n = Float.parseFloat(i);
-      trans.setPrice(n);
+      if (i!=null) {
+        n = Float.parseFloat(i);
+        trans.setPrice(n);
+      } else {
+        float zero = Float.parseFloat("0.00");
+        trans.setPrice(zero);
+      }
       break;
     } catch(CantBeNullException e) {
       System.out.println("Entry cannot be null!");
     } catch(TooLongException e) {
       System.out.println("Entry too long!");
     } catch(NumberFormatException e) {
-      System.out.println("entry in the wrong format!");
+      System.out.println("Entry in the wrong format!");
     }
   }
   
@@ -296,7 +300,7 @@ public void addTransaction() {
   if(input.equalsIgnoreCase("Y") || input.equalsIgnoreCase("N")){
     switch(input.toLowerCase()){
     case "y":
-      trans.finTrans();
+      finTrans(trans);
       break;
       
     case "n":
@@ -314,11 +318,41 @@ public void addTransaction() {
   // auto_sale( transaction_id, seller_id, buyer_id, vehicle_id, s_date, price )
   // - int, char(15), char(15), char(15), date, numberic(9,2)
 }
+public void finTrans(TransactionObj trans) {
+  System.out.println("adding...");
+
+  // Create SQL insert statement to record auto_sale
+  String createString = "insert into auto_sale values (" + trans.getTransId() + "" +
+    ", '" + trans.getSellerId() + "'" +
+    ", '" + trans.getBuyerId() + "'" +
+    ", '" + trans.getVehicleId() + "'" +
+    ", TO_DATE('" + trans.getSDate() + "', 'yyyy/mm/dd')" +
+    ", " + trans.getPrice() + ")";
+  System.out.println(createString);
+
+  String query = "select LOWER(owner_id)" +
+    " from owner" +
+    " where LOWER(vehicle_id) = LOWER('" + trans.getVehicleId() + "') " +
+    "and LOWER(owner_id) = LOWER('" + trans.getSellerId() + "')";
+
+  try {
+    // Create auto_sale
+    Login.stmt.executeUpdate(createString);
+    // Update owner
+    ResultSet rs = Login.stmt.executeQuery(query);
+    String u = trans.getBuyerId();
+    
+    rs.first();
+    rs.updateString("LOWER(owner_id)",u);
+    rs.updateRow();
+    
+    while (rs.next()) {
+      String s = rs.getString("LOWER(owner_id)");
+      System.out.println(s);
+    }
+    System.out.println("Transaction Complete! Goodbye!");
+  } catch(SQLException e) {
+    System.err.println("SQL Fail: " + e.getMessage());
+  }
 }
-
-
-
-
-
-
-
+}
