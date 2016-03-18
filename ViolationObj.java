@@ -77,10 +77,14 @@ public class ViolationObj{
     }
 
     public void printAll(){
-        System.out.println("Ticket#: " + ticketNo + "\nViolator: " + violatorNo +
-                           "\nVehicle Id: " + vehicleID + "\nOfficer Id:  " + officeNo +
-                           "\nViolation: " + vtype + "\nLocation: " + place +
-                           "\nComments: " + descriptions);
+        System.out.println("Ticket#:         " + ticketNo +
+                           "\nOfficer Id:    " + officeNo +
+                           "\nVehicle Id:    " + vehicleID +
+                           "\nViolator:      " + violatorNo +
+                           "\nViolation:     " + vtype +
+                           "\nLocation:      " + place +
+                           "\nComments:      " + descriptions +
+                           "\nDate(today):   " + vDate);
     }
 
     public void printRecord(){
